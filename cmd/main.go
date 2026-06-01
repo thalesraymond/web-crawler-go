@@ -10,6 +10,16 @@ import (
 
 func main() {
 	fmt.Println("Hello World")
-	network.Placeholder(os.Stdout)
-	indexer.Placeholder(os.Stdout)
+
+	net_error := network.Placeholder(os.Stdout)
+	if net_error != nil {
+		fmt.Println("Error: ", net_error)
+		os.Exit(1)
+	}
+
+	indexer_error := indexer.Placeholder(os.Stdout)
+	if indexer_error != nil {
+		fmt.Println("Error: ", indexer_error)
+		os.Exit(1)
+	}
 }
