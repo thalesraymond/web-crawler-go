@@ -1,7 +1,11 @@
 package indexer
 
-import "fmt"
+import (
+	"fmt"
+	"io"
+)
 
-func Placeholder() {
-	fmt.Println("Indexer Placeholder")
+func Placeholder(w io.Writer) error {
+	_, err := fmt.Fprintln(w, "Indexer Placeholder")
+	return err
 }

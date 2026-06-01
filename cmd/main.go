@@ -2,6 +2,7 @@ package main
 
 import (
 	"fmt"
+	"os"
 
 	"github.com/thalesraymond/web-crawler-go/internal/indexer"
 	"github.com/thalesraymond/web-crawler-go/internal/network"
@@ -9,6 +10,6 @@ import (
 
 func main() {
 	fmt.Println("Hello World")
-	network.Placeholder()
-	indexer.Placeholder()
+	network.Placeholder(os.Stdout)
+	indexer.Placeholder(os.Stdout)
 }
