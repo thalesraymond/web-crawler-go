@@ -25,6 +25,7 @@ jobs:
             - Focus on code quality, security, performance, and maintainability.
             - If you find an issue, explain why it's an issue and suggest a fix.
             - Never edit the user branch code directly. Always comment on the pull request with your review.
+            - Use gh cli or Github API to comment on the pull request with your review. Do not use any other method to communicate your review.
 
             PR Data:
             ${{ toJson(github.event.pull_request) }}
