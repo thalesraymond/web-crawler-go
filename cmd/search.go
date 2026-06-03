@@ -11,7 +11,12 @@ func runSearch(args []string) {
 
 	searchQuery := searchCmd.String("query", "", "Search query to search for")
 
-	searchCmd.Parse(args)
+	err := searchCmd.Parse(args)
+
+	if err != nil {
+		fmt.Println("Error parsing search command arguments:", err)
+		os.Exit(1)
+	}
 
 	if *searchQuery == "" {
 		fmt.Println("Error: Search query is required for search command")

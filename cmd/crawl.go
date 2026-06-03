@@ -11,7 +11,12 @@ func runCrawl(args []string) {
 	seedUrl := crawlCmd.String("seed", "https://en.wikipedia.org/wiki/Main_Page", "Root URL to start crawling from")
 	pageLimit := crawlCmd.Int("limit", 100, "Max number of pages to crawl")
 
-	crawlCmd.Parse(args)
+	err := crawlCmd.Parse(args)
+
+	if err != nil {
+		fmt.Println("Error parsing crawl command arguments:", err)
+		os.Exit(1)
+	}
 
 	if *seedUrl == "" {
 		fmt.Println("Error: Seed URL is required for crawl command")
