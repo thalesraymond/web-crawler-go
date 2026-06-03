@@ -1,0 +1,32 @@
+name: Jules PR Review
+on:
+  pull_request:
+    types: [opened, synchronize, reopened, ready_for_review]
+
+concurrency:
+  group: jules-review-${{ github.event.pull_request.number }}
+  cancel-in-progress: true
+
+jobs:
+  scan:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+    steps:
+      - uses: google-labs-code/jules-action@v1.0.0
+        with:
+          prompt: |
+            Act as a senior software engineer. Your mission is to review the changes in this pull request.
+
+            Guidelines:
+            - Try your best to filter out false positives or slop/bad reviews.
+            - Prefer not to comment if confidence is low.
+            - You must NEVER edit the code. You can only comment reviews on the pull request.
+            - Focus on code quality, security, performance, and maintainability.
+            - If you find an issue, explain why it's an issue and suggest a fix.
+            - Never edit the user branch code directly. Always comment on the pull request with your review.
+            - Use gh cli or Github API to comment on the pull request with your review. Do not use any other method to communicate your review.
+
+            PR Data:
+            ${{ toJson(github.event.pull_request) }}
+          jules_api_key: ${{ secrets.JULES_API_KEY }}
