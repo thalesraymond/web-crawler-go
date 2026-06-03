@@ -11,7 +11,7 @@ func runSearch(args []string) {
 
 	searchQuery := searchCmd.String("query", "", "Search query to search for")
 
-	searchCmd.Parse(args)
+	_ = searchCmd.Parse(args) // Error handling is done by flag package, so we can ignore the error here
 
 	if *searchQuery == "" {
 		fmt.Println("Error: Search query is required for search command")
