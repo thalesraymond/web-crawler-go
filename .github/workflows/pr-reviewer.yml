@@ -1,0 +1,27 @@
+name: Jules PR Review
+on:
+  pull_request:
+    types: [opened, synchronize, reopened, ready_for_review]
+
+concurrency:
+  group: jules-review-${{ github.event.pull_request.number }}
+  cancel-in-progress: true
+
+jobs:
+  scan:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+    steps:
+      - uses: google-labs-code/jules-invoke@v1
+        with:
+          prompt: |
+            Act as a senior software engineer. Your mission is to review the changes in this pull request.
+
+            PR Data:
+            ${{ toJson(github.event.pull_request) }}
+
+            Guidelines:
+            - Try your best to filter out false positives or slop/bad reviews.
+            - Prefer not to comment if confidence is low.
+          jules_api_key: ${{ secrets.JULES_API_KEY }}
