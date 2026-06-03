@@ -13,7 +13,7 @@ jobs:
     permissions:
       contents: read
     steps:
-      - uses: google-labs-code/jules-invoke@v1
+      - uses: google-labs-code/jules-action@v1
         with:
           prompt: |
             Act as a senior software engineer. Your mission is to review the changes in this pull request.
