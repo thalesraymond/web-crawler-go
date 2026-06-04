@@ -11,16 +11,17 @@ import (
 
 type CrawlerClient struct {
 	userAgent  string
-	timeout    int
+	timeout    time.Duration
 	httpClient *http.Client
 }
 
 func NewCrawlerClient() *CrawlerClient {
+	timeout := 10 * time.Second
 	return &CrawlerClient{
 		userAgent: "raymond-go-crawler/1.0",
-		timeout:   10, // seconds
+		timeout:   timeout,
 		httpClient: &http.Client{
-			Timeout: 10 * time.Second,
+			Timeout: timeout,
 		},
 	}
 }
@@ -43,7 +44,7 @@ func (c *CrawlerClient) FetchHTML(ctx context.Context, url string) (string, erro
 		return "", fmt.Errorf("failed to execute http request: %w", err)
 	}
 
-	defer func() { _ = httpResponse.Body.Close() }()
+	defer httpResponse.Body.Close() //nolint:errcheck
 
 	if httpResponse.StatusCode != http.StatusOK {
 		return "", fmt.Errorf("received non-200 response: %d", httpResponse.StatusCode)
