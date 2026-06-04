@@ -5,6 +5,7 @@ import (
 	"fmt"
 	"net/http"
 	"net/http/httptest"
+	"strings"
 	"testing"
 )
 
@@ -25,7 +26,7 @@ func TestFetchHTML(t *testing.T) {
 				t.Errorf("expected User-Agent %q, got %q", client.userAgent, r.Header.Get("User-Agent"))
 			}
 			w.WriteHeader(http.StatusOK)
-			_ , _ = fmt.Fprint(w, expectedBody)
+			_, _ = fmt.Fprint(w, expectedBody)
 		}))
 		defer server.Close()
 
@@ -48,6 +49,10 @@ func TestFetchHTML(t *testing.T) {
 		if err == nil {
 			t.Errorf("expected error for 404 response, got nil")
 		}
+
+		if !strings.Contains(err.Error(), "404") {
+			t.Errorf("expected 404 error, got %v", err)
+		}
 	})
 
 	t.Run("network error", func(t *testing.T) {
@@ -55,6 +60,24 @@ func TestFetchHTML(t *testing.T) {
 		_, err := client.FetchHTML(context.Background(), "http://localhost:0")
 		if err == nil {
 			t.Errorf("expected network error, got nil")
+		}
+	})
+
+	t.Run("content-type error", func(t *testing.T) {
+		server := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+			w.Header().Set("Content-Type", "text/plain")
+			w.WriteHeader(http.StatusOK)
+			_, _ = fmt.Fprint(w, "not html")
+		}))
+		defer server.Close()
+
+		_, err := client.FetchHTML(context.Background(), server.URL)
+		if err == nil {
+			t.Errorf("expected content-type error, got nil")
+		}
+
+		if !strings.Contains(err.Error(), "content-type") {
+			t.Errorf("expected content-type error, got %v", err)
 		}
 	})
 }
