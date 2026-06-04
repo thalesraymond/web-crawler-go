@@ -9,12 +9,14 @@ import (
 	"time"
 )
 
+// CrawlerClient is a struct that holds the state of the crawler client
 type CrawlerClient struct {
 	userAgent  string
 	timeout    time.Duration
 	httpClient *http.Client
 }
 
+// NewCrawlerClient creates a new instance of CrawlerClient
 func NewCrawlerClient() *CrawlerClient {
 	timeout := 10 * time.Second
 	return &CrawlerClient{
@@ -26,6 +28,8 @@ func NewCrawlerClient() *CrawlerClient {
 	}
 }
 
+// FetchHTML fetches the HTML content of a given URL
+// it uses the limit decorator pattern to prevent memory issues
 func (c *CrawlerClient) FetchHTML(ctx context.Context, url string) (string, error) {
 	if url == "" {
 		return "", fmt.Errorf("URL cannot be empty")
