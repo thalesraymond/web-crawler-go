@@ -15,7 +15,7 @@ type CrawlerClient struct {
 	httpClient *http.Client
 }
 
-func NewCrawlerClient(ctx context.Context) *CrawlerClient {
+func NewCrawlerClient() *CrawlerClient {
 	return &CrawlerClient{
 		userAgent: "raymond-go-crawler/1.0",
 		timeout:   10, // seconds

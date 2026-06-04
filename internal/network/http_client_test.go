@@ -9,8 +9,7 @@ import (
 )
 
 func TestFetchHTML(t *testing.T) {
-	ctx := context.Background()
-	client := NewCrawlerClient(ctx)
+	client := NewCrawlerClient()
 
 	t.Run("empty URL", func(t *testing.T) {
 		_, err := client.FetchHTML(context.Background(), "")
