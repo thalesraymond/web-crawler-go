@@ -76,7 +76,7 @@ func TestFetchHTML(t *testing.T) {
 			t.Errorf("expected content-type error, got nil")
 		}
 
-		if !strings.Contains(err.Error(), "content-type") {
+		if !strings.Contains(err.Error(), "unexpected content type") {
 			t.Errorf("expected content-type error, got %v", err)
 		}
 	})
