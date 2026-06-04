@@ -1,27 +1,49 @@
 package network
 
 import (
+	"context"
 	"fmt"
 	"io"
 	"net/http"
-	"context"
 	"strings"
+	"time"
 )
 
-func FetchHTML(ctx context.Context, url string) (string, error) {
+type CrawlerClient struct {
+	userAgent  string
+	timeout    int
+	httpClient *http.Client
+}
+
+func NewCrawlerClient(ctx context.Context) *CrawlerClient {
+	return &CrawlerClient{
+		userAgent: "raymond-go-crawler/1.0",
+		timeout:   10, // seconds
+		httpClient: &http.Client{
+			Timeout: 10 * time.Second,
+		},
+	}
+}
+
+func (c *CrawlerClient) FetchHTML(ctx context.Context, url string) (string, error) {
 	if url == "" {
 		return "", fmt.Errorf("URL cannot be empty")
 	}
 
-	httpClient, err := http.NewRequestWithContext(ctx, http.MethodGet, url, nil)
-
+	req, err := http.NewRequestWithContext(ctx, http.MethodGet, url, nil)
 	if err != nil {
 		return "", fmt.Errorf("failed to create http request: %w", err)
 	}
 
-	httpResponse, err := http.DefaultClient.Do(httpClient)
+	req.Header.Set("User-Agent", c.userAgent)
 
-	defer httpResponse.Body.Close() // Ensure the response body is closed after function returns
+	httpResponse, err := c.httpClient.Do(req)
+
+	if err != nil {
+		return "", fmt.Errorf("failed to execute http request: %w", err)
+	}
+
+	defer func() { _ = httpResponse.Body.Close() }()
 
 	if httpResponse.StatusCode != http.StatusOK {
 		return "", fmt.Errorf("received non-200 response: %d", httpResponse.StatusCode)
@@ -31,9 +53,8 @@ func FetchHTML(ctx context.Context, url string) (string, error) {
 		return "", fmt.Errorf("unexpected content type: %s", httpResponse.Header.Get("Content-Type"))
 	}
 
-	inputStream := httpResponse.Body
-	limitedStream := io.LimitReader(inputStream, 10*1024*1024) // Limit to 10MB to prevent memory issues using limit decorator pattern
-	bodyBytes, err := io.ReadAll(limitedStream) 
+	limitedStream := io.LimitReader(httpResponse.Body, 10*1024*1024) // Limit to 10MB to prevent memory issues using limit decorator pattern
+	bodyBytes, err := io.ReadAll(limitedStream)
 
 	if err != nil {
 		return "", fmt.Errorf("failed to read response body: %w", err)
