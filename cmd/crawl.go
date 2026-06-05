@@ -32,14 +32,14 @@ func runCrawl(args []string) {
 	// TODO: This is just to test a real world download case, will be removed after the
 	// real crawling logic is implemented
 	ctx := context.Background()
-	
+
 	html, err := httpClient.FetchHTML(ctx, *seedUrl)
 	if err != nil {
-		fmt.Println("Error fetching HTML:", err)
-		os.Exit(1)
+		fmt.Println("Warning: seed prefetch failed:", err)
+	} else {
+		fmt.Println("Fetched HTML content of length:", len(html))
 	}
-	
-	fmt.Println("Fetched HTML content of length:", len(html))
+
 	fmt.Println("Crawling website:", *seedUrl)
 	fmt.Println("Max pages to crawl:", *pageLimit)
 }
