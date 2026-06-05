@@ -1,9 +1,12 @@
 package main
 
 import (
+	"context"
 	"flag"
 	"fmt"
 	"os"
+
+	"github.com/thalesraymond/web-crawler-go/internal/network"
 )
 
 func runCrawl(args []string) {
@@ -21,6 +24,20 @@ func runCrawl(args []string) {
 	if *pageLimit <= 0 {
 		fmt.Println("Error: Page limit must be greater than 0")
 		os.Exit(1)
+	}
+
+	httpClient := network.NewCrawlerClient()
+
+	// testing the HTTP client by fetching the HTML content of the seed URL
+	// TODO: This is just to test a real world download case, will be removed after the
+	// real crawling logic is implemented
+	ctx := context.Background()
+
+	html, err := httpClient.FetchHTML(ctx, *seedUrl)
+	if err != nil {
+		fmt.Println("Warning: seed prefetch failed:", err)
+	} else {
+		fmt.Println("Fetched HTML content of length:", len(html))
 	}
 
 	fmt.Println("Crawling website:", *seedUrl)
