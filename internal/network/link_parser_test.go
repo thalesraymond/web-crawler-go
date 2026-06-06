@@ -83,14 +83,12 @@ func TestExtractLinks(t *testing.T) {
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
 			gotLinks, err := ExtractLinks(tt.baseURL, tt.htmlBody)
+			if (err != nil) != tt.wantErr {
+				t.Fatalf("expected error=%v, got err=%v", tt.wantErr, err)
+			}
 			if err != nil {
-				if tt.wantErr {
-					return
-				}
-				t.Errorf("unexpected error: %v", err)
 				return
 			}
-
 			if len(gotLinks) != len(tt.wantLinks) {
 				t.Errorf("expected %d links, got %d", len(tt.wantLinks), len(gotLinks))
 				return
