@@ -66,6 +66,18 @@ func TestExtractLinks(t *testing.T) {
 			},
 			wantErr: false,
 		},
+		{
+			name:    "links with javascript or only frangment",
+			baseURL: "https://example.com",
+			htmlBody: `
+			<html><body>
+			<a href="javascript:void(0)">Javascript link</a>
+			<a href="#section1">Fragment link</a>
+			</body></html>
+			`,
+			wantLinks: []string{},
+			wantErr:   false,
+		},
 	}
 
 	for _, tt := range tests {

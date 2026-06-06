@@ -41,18 +41,36 @@ func ExtractLinks(baseURL string, htmlBody string) ([]string, error) {
 				continue
 			}
 
+			if !isValidLink(attr.Val) {
+				continue
+			}
+
 			link, err := parsedBaseURL.Parse(attr.Val)
 
 			if err != nil || (link.Scheme != "http" && link.Scheme != "https") {
 				continue
 			}
 
-			absURL := parsedBaseURL.ResolveReference(link)
-			absURL.Fragment = ""
+			link.Fragment = ""
 
-			links = append(links, absURL.String())
+			links = append(links, link.String())
 		}
 	}
 
 	return links, nil
+}
+
+func isValidLink(link string) bool {
+	invalidPrefixes := []string{
+		"javascript:",
+		"mailto:",
+		"#",
+	}
+
+	for _, invalidPrefix := range invalidPrefixes {
+		if strings.HasPrefix(link, invalidPrefix) {
+			return false
+		}
+	}
+	return true
 }
