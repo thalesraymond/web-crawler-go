@@ -11,6 +11,14 @@ import (
 func ExtractLinks(baseURL string, htmlBody string) ([]string, error) {
 	var links []string
 
+	if baseURL == "" {
+		return nil, fmt.Errorf("base URL cannot be empty")
+	}
+
+	if htmlBody == "" {
+		return nil, fmt.Errorf("HTML body cannot be empty")
+	}
+
 	parsedBaseURL, err := url.Parse(baseURL)
 
 	if err != nil {

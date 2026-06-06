@@ -78,6 +78,24 @@ func TestExtractLinks(t *testing.T) {
 			wantLinks: []string{},
 			wantErr:   false,
 		},
+		{
+			name:    "invalid base url",
+			baseURL: "",
+			htmlBody: `
+			<html><body>
+			<a href="/page1">Page 1</a>
+			</body></html>
+			`,
+			wantLinks: []string{},
+			wantErr:   true,
+		},
+		{
+			name:      "empty html body",
+			baseURL:   "https://example.com",
+			htmlBody:  "",
+			wantLinks: []string{},
+			wantErr:   true,
+		},
 	}
 
 	for _, tt := range tests {
