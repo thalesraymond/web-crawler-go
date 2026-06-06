@@ -28,7 +28,11 @@ web-crawler-go/
 │   ├── crawl.go                # crawl subcommand flags & logic
 │   └── search.go               # search subcommand flags & logic
 ├── internal/
-│   ├── network/                # HTTP fetching & link extraction (WIP)
+│   ├── network/                # HTTP fetching & link extraction
+│   │   ├── http_client.go
+│   │   ├── http_client_test.go
+│   │   ├── link_parser.go
+│   │   ├── link_parser_test.go
 │   │   ├── network_placeholder.go
 │   │   └── network_placeholder_test.go
 │   └── indexer/                # Page indexing & search (WIP)
@@ -104,8 +108,8 @@ A GitHub Actions workflow runs on every push and pull request to `main`:
 
 ## Roadmap
 
-- [ ] Implement HTTP fetching in `internal/network`
-- [ ] Parse HTML and extract links
+- [x] Implement HTTP fetching in `internal/network`
+- [x] Parse HTML and extract links
 - [ ] Implement BFS/DFS crawl strategy with depth & rate limiting
 - [ ] Build page indexer in `internal/indexer`
 - [ ] Implement search over indexed content
