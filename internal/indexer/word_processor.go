@@ -30,10 +30,6 @@ func ProcessWord(word string) (string, error) {
 		return "", fmt.Errorf("word is too short")
 	}
 
-	if _, isStopWord := stopWords[word]; isStopWord {
-		return "", fmt.Errorf("word is a stop word")
-	}
-
 	parts := strings.Fields(word)
 	if len(parts) > 1 {
 		return "", fmt.Errorf("word contains more than one word")
@@ -50,7 +46,11 @@ func ProcessWord(word string) (string, error) {
 		wordWithoutAccents = cleanWord
 	}
 	if wordWithoutAccents == "" {
-		return "", nil
+		return "", fmt.Errorf("word is empty after normalization")
+	}
+
+	if _, isStopWord := stopWords[wordWithoutAccents]; isStopWord {
+		return "", fmt.Errorf("word is a stop word")
 	}
 
 	return wordWithoutAccents, nil

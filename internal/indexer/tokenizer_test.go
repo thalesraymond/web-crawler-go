@@ -76,6 +76,14 @@ func TestExtractPageTokens(t *testing.T) {
 				{word: "main_content", count: 1},
 			},
 		},
+		{
+			name:     "nested invalid tags",
+			htmlBody: "<header><nav>SHOULDNOTBEHERE</nav>header_text</header><div><p>hello <span>world</span></p></div>",
+			want: []PageToken{
+				{word: "hello", count: 1},
+				{word: "world", count: 1},
+			},
+		},
 	}
 
 	for _, tt := range tests {

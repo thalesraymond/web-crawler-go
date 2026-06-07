@@ -14,7 +14,7 @@ type PageToken struct {
 func ExtractPageTokens(htmlBody string) []PageToken {
 	tokenizer := html.NewTokenizer(strings.NewReader(htmlBody))
 	var textBuilder strings.Builder
-	isInsideScriptOrStyle := false
+	insideInvalidTags := 0
 
 	for {
 		tokenType := tokenizer.Next()
@@ -26,18 +26,18 @@ func ExtractPageTokens(htmlBody string) []PageToken {
 		if tokenType == html.StartTagToken {
 			token := tokenizer.Token()
 			if token.Data == "script" || token.Data == "style" || token.Data == "nav" || token.Data == "footer" || token.Data == "header" || token.Data == "aside" {
-				isInsideScriptOrStyle = true
+				insideInvalidTags++
 			}
 		}
 
 		if tokenType == html.EndTagToken {
 			token := tokenizer.Token()
 			if token.Data == "script" || token.Data == "style" || token.Data == "nav" || token.Data == "footer" || token.Data == "header" || token.Data == "aside" {
-				isInsideScriptOrStyle = false
+				insideInvalidTags--
 			}
 		}
 
-		if tokenType == html.TextToken && !isInsideScriptOrStyle {
+		if tokenType == html.TextToken && insideInvalidTags == 0 {
 			textBuilder.WriteString(tokenizer.Token().Data)
 			textBuilder.WriteString(" ")
 		}

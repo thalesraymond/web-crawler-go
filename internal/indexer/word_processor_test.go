@@ -54,6 +54,12 @@ func TestProcessWord(t *testing.T) {
 			wantedWord:  "",
 			wantedError: errors.New("word is a stop word"),
 		},
+		{
+			name:        "word empty after normalization",
+			rawWord:     "_?_",
+			wantedWord:  "",
+			wantedError: errors.New("word is empty after normalization"),
+		},
 	}
 
 	for _, tt := range tests {
