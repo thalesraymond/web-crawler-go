@@ -6,16 +6,6 @@ import (
 	"golang.org/x/net/html"
 )
 
-var stopWords = map[string]struct{}{
-	// Portuguese
-	"o": {}, "a": {}, "os": {}, "as": {}, "um": {}, "uma": {},
-	"de": {}, "do": {}, "da": {}, "em": {}, "no": {}, "na": {},
-	"para": {}, "com": {}, "por": {}, "que": {}, "e": {}, "ou": {},
-	// English
-	"the": {}, "of": {}, "to": {}, "and": {}, "in": {}, "is": {},
-	"it": {}, "that": {}, "for": {}, "on": {}, "are": {}, "with": {},
-}
-
 type PageToken struct {
 	word  string
 	count int
@@ -59,14 +49,6 @@ func ExtractPageTokens(htmlBody string) []PageToken {
 	savedWords := make(map[string]int)
 
 	for _, word := range rawWords {
-		if len(word) < 2 {
-			continue
-		}
-
-		if _, isStopWord := stopWords[word]; isStopWord {
-			continue
-		}
-
 		wordToSave, err := ProcessWord(word)
 
 		if err != nil {

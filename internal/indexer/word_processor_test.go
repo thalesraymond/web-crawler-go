@@ -43,10 +43,16 @@ func TestProcessWord(t *testing.T) {
 			wantedError: errors.New("word contains more than one word"),
 		},
 		{
-			name:        "empty string (invalid, error)",
-			rawWord:     "",
+			name:        "word too short",
+			rawWord:     "a",
 			wantedWord:  "",
-			wantedError: errors.New("word cannot be empty"),
+			wantedError: errors.New("word is too short"),
+		},
+		{
+			name:        "stop word",
+			rawWord:     "the",
+			wantedWord:  "",
+			wantedError: errors.New("word is a stop word"),
 		},
 	}
 

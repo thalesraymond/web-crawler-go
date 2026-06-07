@@ -12,12 +12,26 @@ import (
 
 var normalizer = transform.Chain(norm.NFD, runes.Remove(runes.In(unicode.Mn)), norm.NFC)
 
+var stopWords = map[string]struct{}{
+	// Portuguese
+	"o": {}, "a": {}, "os": {}, "as": {}, "um": {}, "uma": {},
+	"de": {}, "do": {}, "da": {}, "em": {}, "no": {}, "na": {},
+	"para": {}, "com": {}, "por": {}, "que": {}, "e": {}, "ou": {},
+	// English
+	"the": {}, "of": {}, "to": {}, "and": {}, "in": {}, "is": {},
+	"it": {}, "that": {}, "for": {}, "on": {}, "are": {}, "with": {},
+}
+
 func ProcessWord(word string) (string, error) {
 
 	word = strings.TrimSpace(word)
 
-	if word == "" {
-		return "", fmt.Errorf("word cannot be empty")
+	if len(word) < 2 {
+		return "", fmt.Errorf("word is too short")
+	}
+
+	if _, isStopWord := stopWords[word]; isStopWord {
+		return "", fmt.Errorf("word is a stop word")
 	}
 
 	parts := strings.Fields(word)
