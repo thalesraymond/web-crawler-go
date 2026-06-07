@@ -24,18 +24,16 @@ var stopWords = map[string]struct{}{
 
 func ProcessWord(word string) (string, error) {
 
-	word = strings.TrimSpace(word)
+	cleanWord := strings.ToLower(strings.TrimSpace(word))
 
-	if len(word) < 2 {
+	if len(cleanWord) < 2 {
 		return "", fmt.Errorf("word is too short")
 	}
 
-	parts := strings.Fields(word)
+	parts := strings.Fields(cleanWord)
 	if len(parts) > 1 {
 		return "", fmt.Errorf("word contains more than one word")
 	}
-
-	cleanWord := strings.ToLower(word)
 
 	cleanWord = strings.TrimRightFunc(cleanWord, func(r rune) bool {
 		return unicode.IsPunct(r) || unicode.IsSymbol(r)
