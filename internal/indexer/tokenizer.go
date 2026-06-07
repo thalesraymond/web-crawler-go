@@ -7,8 +7,8 @@ import (
 )
 
 type PageToken struct {
-	word  string
-	count int
+	Word  string
+	Count int
 }
 
 func ExtractPageTokens(htmlBody string) []PageToken {
@@ -59,7 +59,7 @@ func ExtractPageTokens(htmlBody string) []PageToken {
 	}
 
 	for word, count := range savedWords {
-		finalTokens = append(finalTokens, PageToken{word: word, count: count})
+		finalTokens = append(finalTokens, PageToken{Word: word, Count: count})
 	}
 
 	return finalTokens
