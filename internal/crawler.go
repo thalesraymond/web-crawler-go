@@ -19,6 +19,7 @@ type Crawler struct {
 	queue         chan string
 	done          chan struct{}
 	pageLimit     int
+	crawlDelay    time.Duration
 	currentResult chan *CrawlResult
 	workerWg      sync.WaitGroup
 	sendWg        sync.WaitGroup
@@ -46,6 +47,7 @@ func NewCrawler(client *network.CrawlerClient, urlTracker *network.URLTracker, c
 		queue:         make(chan string),
 		done:          make(chan struct{}),
 		pageLimit:     pageLimit,
+		crawlDelay:    1000 * time.Millisecond,
 		currentResult: make(chan *CrawlResult),
 	}
 }
@@ -123,7 +125,7 @@ func (c *Crawler) worker() {
 func (c *Crawler) crawlURL(url string) {
 	html, err := c.client.FetchHTML(context.Background(), url)
 
-	time.Sleep(1000 * time.Millisecond) // Pause to be gentle with the server and avoid rate limiting / ip ban
+	time.Sleep(c.crawlDelay) // Pause to be gentle with the server and avoid rate limiting / ip ban
 
 	if err != nil {
 		c.currentResult <- &CrawlResult{

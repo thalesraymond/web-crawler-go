@@ -32,7 +32,7 @@ func runCrawl(args []string) {
 		5,
 		*pageLimit,
 	)
-	
+
 	fmt.Println("Crawling website:", *seedUrl)
 	fmt.Println("Max pages to crawl:", *pageLimit)
 
@@ -52,7 +52,5 @@ func runCrawl(args []string) {
 		fmt.Printf("   Links: %d\n", len(result.Links))
 		fmt.Println()
 	}
-
-
 
 }
