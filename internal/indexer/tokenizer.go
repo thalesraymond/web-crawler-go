@@ -42,8 +42,8 @@ func ExtractPageTokens(htmlBody string) []PageToken {
 		}
 
 		if tokenType == html.TextToken && insideInvalidTags == 0 {
-			textBuilder.WriteString(tokenizer.Token().Data)
-			textBuilder.WriteString(" ")
+			textBuilder.Write(tokenizer.Text())
+			textBuilder.WriteByte(' ')
 		}
 	}
 
