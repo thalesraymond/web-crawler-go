@@ -12,7 +12,8 @@ type PageToken struct {
 }
 
 func isInvalidTag(tagName string) bool {
-	return tagName == "script" || tagName == "style" || tagName == "nav" || tagName == "footer" || tagName == "header" || tagName == "aside"
+	lowerTag := strings.ToLower(tagName)
+	return lowerTag == "script" || lowerTag == "style" || lowerTag == "nav" || lowerTag == "footer" || lowerTag == "header" || lowerTag == "aside"
 }
 
 func ExtractPageTokens(htmlBody string) []PageToken {
