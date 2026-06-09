@@ -74,7 +74,7 @@ func TestGetResults_InitiallyEmpty(t *testing.T) {
 func TestStart_SinglePage(t *testing.T) {
 	srv := newTestServer(t, func(w http.ResponseWriter, r *http.Request) {
 		w.Header().Set("Content-Type", "text/html")
-		fmt.Fprint(w, htmlPage()) // no outbound links
+		_, _ = fmt.Fprint(w, htmlPage()) // no outbound links
 	})
 
 	c := newCrawler(1, 5)
@@ -106,7 +106,7 @@ func TestStart_PageLimit(t *testing.T) {
 		id := int(counter.Add(1))
 		child := fmt.Sprintf("%s/page/%d", srv.URL, id)
 		w.Header().Set("Content-Type", "text/html")
-		fmt.Fprint(w, htmlPage(child))
+		_, _ = fmt.Fprint(w, htmlPage(child))
 	})
 
 	c := newCrawler(2, limit)
@@ -128,7 +128,7 @@ func TestStart_NoDuplicates(t *testing.T) {
 		// Every page links to the same single child URL, which should only be visited once.
 		child := srv.URL + "/child"
 		w.Header().Set("Content-Type", "text/html")
-		fmt.Fprint(w, htmlPage(child, child, child)) // duplicated intentionally
+		_, _ = fmt.Fprint(w, htmlPage(child, child, child)) // duplicated intentionally
 	})
 
 	c := newCrawler(2, 10)
@@ -165,10 +165,10 @@ func TestStart_LinksExtracted(t *testing.T) {
 		switch r.URL.Path {
 		case "/":
 			// Root page links to two children.
-			fmt.Fprint(w, htmlPage(srv.URL+"/a", srv.URL+"/b"))
+			_, _ = fmt.Fprint(w, htmlPage(srv.URL+"/a", srv.URL+"/b"))
 		default:
 			// Child pages have no outbound links.
-			fmt.Fprint(w, htmlPage())
+			_, _ = fmt.Fprint(w, htmlPage())
 		}
 	})
 
@@ -195,9 +195,9 @@ func TestStart_ConcurrentWorkers(t *testing.T) {
 			links = append(links, fmt.Sprintf("%s/page/%d", srv.URL, i))
 		}
 		if r.URL.Path == "/" {
-			fmt.Fprint(w, htmlPage(links...))
+			_, _ = fmt.Fprint(w, htmlPage(links...))
 		} else {
-			fmt.Fprint(w, htmlPage())
+			_, _ = fmt.Fprint(w, htmlPage())
 		}
 	})
 
@@ -215,7 +215,7 @@ func TestStart_ConcurrentWorkers(t *testing.T) {
 func TestStart_ResultContainsTokens(t *testing.T) {
 	srv := newTestServer(t, func(w http.ResponseWriter, r *http.Request) {
 		w.Header().Set("Content-Type", "text/html")
-		fmt.Fprint(w, `<html><body><p>hello world</p></body></html>`)
+		_, _ = fmt.Fprint(w, `<html><body><p>hello world</p></body></html>`)
 	})
 
 	c := newCrawler(1, 5)
@@ -236,7 +236,7 @@ func TestStart_ResultContainsHTML(t *testing.T) {
 
 	srv := newTestServer(t, func(w http.ResponseWriter, r *http.Request) {
 		w.Header().Set("Content-Type", "text/html")
-		fmt.Fprint(w, pageHTML)
+		_, _ = fmt.Fprint(w, pageHTML)
 	})
 
 	c := newCrawler(1, 5)
