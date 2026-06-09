@@ -1,11 +1,11 @@
 package main
 
 import (
-	"context"
 	"flag"
 	"fmt"
 	"os"
 
+	"github.com/thalesraymond/web-crawler-go/internal"
 	"github.com/thalesraymond/web-crawler-go/internal/network"
 )
 
@@ -26,20 +26,33 @@ func runCrawl(args []string) {
 		os.Exit(1)
 	}
 
-	httpClient := network.NewCrawlerClient()
-
-	// testing the HTTP client by fetching the HTML content of the seed URL
-	// TODO: This is just to test a real world download case, will be removed after the
-	// real crawling logic is implemented
-	ctx := context.Background()
-
-	html, err := httpClient.FetchHTML(ctx, *seedUrl)
-	if err != nil {
-		fmt.Println("Warning: seed prefetch failed:", err)
-	} else {
-		fmt.Println("Fetched HTML content of length:", len(html))
-	}
-
+	crawler := internal.NewCrawler(
+		network.NewCrawlerClient(),
+		network.NewURLTracker(),
+		5,
+		*pageLimit,
+	)
+	
 	fmt.Println("Crawling website:", *seedUrl)
 	fmt.Println("Max pages to crawl:", *pageLimit)
+
+	crawler.Start(*seedUrl)
+
+	results := crawler.GetResults()
+
+	for i, result := range results {
+		if result.Error != nil {
+			fmt.Printf("%d. URL: %s\n", i+1, result.URL)
+			fmt.Printf("   Error: %s\n", result.Error)
+			continue
+		}
+		
+		fmt.Printf("%d. URL: %s\n", i+1, result.URL)
+		fmt.Printf("   Tokens: %d\n", len(result.Tokens))
+		fmt.Printf("   Links: %d\n", len(result.Links))
+		fmt.Println()
+	}
+
+
+
 }
