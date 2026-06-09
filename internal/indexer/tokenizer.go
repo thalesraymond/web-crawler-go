@@ -28,21 +28,21 @@ func ExtractPageTokens(htmlBody string) []PageToken {
 		}
 
 		if tokenType == html.StartTagToken {
-			token := tokenizer.Token()
-			if isInvalidTag(token.Data) {
+			name, _ := tokenizer.TagName()
+			if isInvalidTag(string(name)) {
 				insideInvalidTags++
 			}
 		}
 
 		if tokenType == html.EndTagToken {
-			token := tokenizer.Token()
-			if isInvalidTag(token.Data) {
+			name, _ := tokenizer.TagName()
+			if isInvalidTag(string(name)) {
 				insideInvalidTags--
 			}
 		}
 
 		if tokenType == html.TextToken && insideInvalidTags == 0 {
-			textBuilder.WriteString(tokenizer.Token().Data)
+			textBuilder.Write(tokenizer.Text())
 			textBuilder.WriteString(" ")
 		}
 	}
