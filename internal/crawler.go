@@ -74,12 +74,17 @@ func (c *Crawler) Start(seedUrl string) {
 		log.Printf("Result: %s", result.URL)
 
 		if result.Error != nil {
+			linksToProcess--
 			continue
 		}
 
 		c.results = append(c.results, result)
 
 		for _, link := range result.Links {
+			if len(c.results)+linksToProcess >= c.pageLimit {
+				break
+			}
+
 			if c.urlTracker.MarkVisited(link) {
 				linksToProcess++
 
