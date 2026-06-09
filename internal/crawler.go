@@ -41,14 +41,11 @@ func (c *Crawler) GetResults() []*CrawlResult {
 
 func NewCrawler(client *network.CrawlerClient, urlTracker *network.URLTracker, concurrency int, pageLimit int) *Crawler {
 	return &Crawler{
-		client:        client,
-		urlTracker:    urlTracker,
-		concurrency:   concurrency,
-		queue:         make(chan string),
-		done:          make(chan struct{}),
-		pageLimit:     pageLimit,
-		crawlDelay:    1000 * time.Millisecond,
-		currentResult: make(chan *CrawlResult),
+		client:      client,
+		urlTracker:  urlTracker,
+		concurrency: concurrency,
+		pageLimit:   pageLimit,
+		crawlDelay:  1000 * time.Millisecond,
 	}
 }
 
@@ -91,12 +88,12 @@ func (c *Crawler) Start(seedUrl string) {
 				linksToProcess++
 
 				// Send to queue without blocking; bail out if crawl is done.
-				c.sendWg.Add(1) 
+				c.sendWg.Add(1)
 				go func(urlToSend string) {
-					defer c.sendWg.Done() 
-					select { 
-					case c.queue <- urlToSend: 
-					case <-c.done: 
+					defer c.sendWg.Done()
+					select {
+					case c.queue <- urlToSend:
+					case <-c.done:
 					}
 				}(link)
 			}
