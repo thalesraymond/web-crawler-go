@@ -74,7 +74,7 @@ func (c *Crawler) Start(seedUrl string) {
 		log.Printf("Result: %s", result.URL)
 
 		if result.Error != nil {
-			linksToProcess--
+			linksToProcess-- // We didn't actually process a page, so decrement the count
 			continue
 		}
 
@@ -89,12 +89,12 @@ func (c *Crawler) Start(seedUrl string) {
 				linksToProcess++
 
 				// Send to queue without blocking; bail out if crawl is done.
-				c.sendWg.Add(1)
+				c.sendWg.Add(1) 
 				go func(urlToSend string) {
-					defer c.sendWg.Done()
-					select {
-					case c.queue <- urlToSend:
-					case <-c.done:
+					defer c.sendWg.Done() 
+					select { 
+					case c.queue <- urlToSend: 
+					case <-c.done: 
 					}
 				}(link)
 			}
@@ -123,7 +123,7 @@ func (c *Crawler) worker() {
 func (c *Crawler) crawlURL(url string) {
 	html, err := c.client.FetchHTML(context.Background(), url)
 
-	time.Sleep(5000 * time.Millisecond)
+	time.Sleep(1000 * time.Millisecond) // Pause to be gentle with the server and avoid rate limiting / ip ban
 
 	if err != nil {
 		c.currentResult <- &CrawlResult{
