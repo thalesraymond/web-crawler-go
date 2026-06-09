@@ -46,14 +46,11 @@ func TestURLTracker_ConcurrentAccess(t *testing.T) {
 
 	wg.Wait()
 
-	tracker.mu.Lock()
-	defer tracker.mu.Unlock()
-
 	// 100 unique URLs per goroutine (100 goroutines) = 10000 unique URLs
 	// 100 shared URLs across all goroutines = 100 shared URLs
 	// Total should be 10100 visited URLs
 	expectedCount := numGoroutines*numUrlsPerGoroutine + numUrlsPerGoroutine
-	if len(tracker.visited) != expectedCount {
+	if tracker.VisitedCount() != expectedCount {
 		t.Errorf("Expected %d visited URLs, got %d", expectedCount, len(tracker.visited))
 	}
 }

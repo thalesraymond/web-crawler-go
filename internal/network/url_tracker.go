@@ -5,15 +5,20 @@ import (
 )
 
 type URLTracker struct {
-	mu      sync.Mutex
+	mu      sync.RWMutex
 	visited map[string]struct{}
 }
 
 func NewURLTracker() *URLTracker {
 	return &URLTracker{
-		mu:      sync.Mutex{},
 		visited: make(map[string]struct{}),
 	}
+}
+
+func (t *URLTracker) VisitedCount() int {
+	t.mu.RLock()
+	defer t.mu.RUnlock()
+	return len(t.visited)
 }
 
 func (t *URLTracker) MarkVisited(url string) bool {
