@@ -12,7 +12,7 @@ import (
 func runCrawl(args []string) {
 	crawlCmd := flag.NewFlagSet("crawl", flag.ExitOnError)
 	seedUrl := crawlCmd.String("seed", "https://en.wikipedia.org/wiki/Main_Page", "Root URL to start crawling from")
-	pageLimit := crawlCmd.Int("limit", 100, "Max number of pages to crawl")
+	pageLimit := crawlCmd.Int("limit", 5, "Max number of pages to crawl")
 
 	_ = crawlCmd.Parse(args) // Error handling is done by flag package, so we can ignore the error here
 
@@ -46,7 +46,7 @@ func runCrawl(args []string) {
 			fmt.Printf("   Error: %s\n", result.Error)
 			continue
 		}
-		
+
 		fmt.Printf("%d. URL: %s\n", i+1, result.URL)
 		fmt.Printf("   Tokens: %d\n", len(result.Tokens))
 		fmt.Printf("   Links: %d\n", len(result.Links))

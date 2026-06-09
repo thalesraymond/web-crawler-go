@@ -17,9 +17,11 @@ type Crawler struct {
 	urlTracker    *network.URLTracker
 	concurrency   int
 	queue         chan string
+	done          chan struct{}
 	pageLimit     int
 	currentResult chan *CrawlResult
 	workerWg      sync.WaitGroup
+	sendWg        sync.WaitGroup
 
 	results []*CrawlResult
 }
@@ -42,6 +44,7 @@ func NewCrawler(client *network.CrawlerClient, urlTracker *network.URLTracker, c
 		urlTracker:    urlTracker,
 		concurrency:   concurrency,
 		queue:         make(chan string),
+		done:          make(chan struct{}),
 		pageLimit:     pageLimit,
 		currentResult: make(chan *CrawlResult),
 	}
@@ -52,6 +55,7 @@ func (c *Crawler) Start(seedUrl string) {
 
 	c.currentResult = make(chan *CrawlResult, c.pageLimit)
 	c.queue = make(chan string, c.pageLimit)
+	c.done = make(chan struct{})
 
 	c.workerWg.Add(c.concurrency)
 	for i := 0; i < c.concurrency; i++ {
@@ -61,11 +65,13 @@ func (c *Crawler) Start(seedUrl string) {
 	c.urlTracker.MarkVisited(seedUrl)
 	c.queue <- seedUrl
 
-	linksToProcess := 1 //Will prevent workers fron hanging if total links is less than page limit
+	linksToProcess := 1 // Will prevent workers from hanging if total links is less than page limit
 
 	for linksToProcess > 0 && len(c.results) < c.pageLimit {
 		linksToProcess--
 		result := <-c.currentResult
+
+		log.Printf("Result: %s", result.URL)
 
 		if result.Error != nil {
 			continue
@@ -77,17 +83,27 @@ func (c *Crawler) Start(seedUrl string) {
 			if c.urlTracker.MarkVisited(link) {
 				linksToProcess++
 
-				// Do not block if queue is full
+				// Send to queue without blocking; bail out if crawl is done.
+				c.sendWg.Add(1)
 				go func(urlToSend string) {
-					c.queue <- urlToSend
+					defer c.sendWg.Done()
+					select {
+					case c.queue <- urlToSend:
+					case <-c.done:
+					}
 				}(link)
 			}
 		}
 	}
 
-	close(c.queue)
-	close(c.currentResult)
+	// Signal all pending send goroutines to stop, then wait for them.
+	close(c.done)
+	c.sendWg.Wait()
 
+	// No more sends; safe to close the queue so workers exit.
+	close(c.queue)
+	c.workerWg.Wait()
+	close(c.currentResult)
 }
 
 func (c *Crawler) worker() {
@@ -102,7 +118,7 @@ func (c *Crawler) worker() {
 func (c *Crawler) crawlURL(url string) {
 	html, err := c.client.FetchHTML(context.Background(), url)
 
-	time.Sleep(1000 * time.Millisecond)
+	time.Sleep(5000 * time.Millisecond)
 
 	if err != nil {
 		c.currentResult <- &CrawlResult{
