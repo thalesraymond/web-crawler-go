@@ -6,6 +6,35 @@ import (
 	"testing"
 )
 
+func TestIsInvalidTag(t *testing.T) {
+	tests := []struct {
+		name    string
+		tagName string
+		want    bool
+	}{
+		{"script tag", "script", true},
+		{"style tag", "style", true},
+		{"nav tag", "nav", true},
+		{"footer tag", "footer", true},
+		{"header tag", "header", true},
+		{"aside tag", "aside", true},
+		{"div tag", "div", false},
+		{"p tag", "p", false},
+		{"span tag", "span", false},
+		{"empty string", "", false},
+		{"unrecognized tag", "customtag", false},
+		{"uppercase script tag", "SCRIPT", false},
+	}
+
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			if got := isInvalidTag(tt.tagName); got != tt.want {
+				t.Errorf("isInvalidTag(%q) = %v, want %v", tt.tagName, got, tt.want)
+			}
+		})
+	}
+}
+
 func TestExtractPageTokens(t *testing.T) {
 	tests := []struct {
 		name     string
