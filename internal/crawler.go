@@ -73,7 +73,6 @@ func (c *Crawler) Start(seedUrl string) {
 		log.Printf("Result: %s", result.URL)
 
 		if result.Error != nil {
-			linksToProcess-- // We didn't actually process a page, so decrement the count
 			continue
 		}
 
