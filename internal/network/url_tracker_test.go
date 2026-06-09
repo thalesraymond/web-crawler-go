@@ -51,6 +51,6 @@ func TestURLTracker_ConcurrentAccess(t *testing.T) {
 	// Total should be 10100 visited URLs
 	expectedCount := numGoroutines*numUrlsPerGoroutine + numUrlsPerGoroutine
 	if tracker.VisitedCount() != expectedCount {
-		t.Errorf("Expected %d visited URLs, got %d", expectedCount, len(tracker.visited))
+		t.Errorf("Expected %d visited URLs, got %d", expectedCount, tracker.VisitedCount())
 	}
 }
