@@ -38,6 +38,9 @@ type CrawlResult struct {
 }
 
 func NewCrawler(client *network.CrawlerClient, urlTracker *network.URLTracker, concurrency int, pageLimit int, storage ResultStorage) *Crawler {
+	if storage == nil {
+		log.Panic("storage passed on NewCrawler must not be nil!")
+	}
 	return &Crawler{
 		client:      client,
 		urlTracker:  urlTracker,
