@@ -38,22 +38,26 @@ func ExtractLinks(baseURL string, htmlBody string) ([]string, error) {
 			continue
 		}
 
-		token := tokenizer.Token()
+		tagName, hasAttr := tokenizer.TagName()
 
-		if token.Data != "a" {
+		if len(tagName) != 1 || tagName[0] != 'a' {
 			continue
 		}
 
-		for _, attr := range token.Attr {
-			if attr.Key != "href" {
+		for hasAttr {
+			var key, val []byte
+			key, val, hasAttr = tokenizer.TagAttr()
+
+			if string(key) != "href" {
 				continue
 			}
 
-			if !isValidLink(attr.Val) {
+			attrVal := string(val)
+			if !isValidLink(attrVal) {
 				continue
 			}
 
-			link, err := parsedBaseURL.Parse(attr.Val)
+			link, err := parsedBaseURL.Parse(attrVal)
 
 			if err != nil || (link.Scheme != "http" && link.Scheme != "https") {
 				continue
