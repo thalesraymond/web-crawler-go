@@ -2,7 +2,7 @@
 
 A simple web crawler written in Go that simulates "Google-like" indexing. Built as the first personal project for the [Boot.dev](https://www.boot.dev/) course.
 
-> **Status:** 🚧 Work in progress — the project scaffolding and CLI are in place; core crawling and indexing logic is coming soon.
+> **Status:** 🚧 Work in progress — the core crawling, indexing, and persistent storage are implemented. Search functionality is currently being built.
 
 ---
 
@@ -28,16 +28,23 @@ web-crawler-go/
 │   ├── crawl.go                # crawl subcommand flags & logic
 │   └── search.go               # search subcommand flags & logic
 ├── internal/
+│   ├── crawler.go              # Core crawler logic (goroutines/channels)
+│   ├── crawler_test.go
 │   ├── network/                # HTTP fetching & link extraction
 │   │   ├── http_client.go
 │   │   ├── http_client_test.go
 │   │   ├── link_parser.go
 │   │   ├── link_parser_test.go
-│   │   ├── network_placeholder.go
-│   │   └── network_placeholder_test.go
-│   └── indexer/                # Page indexing & search (WIP)
-│       ├── indexer_placeholder.go
-│       └── indexer_placeholder_test.go
+│   │   ├── url_tracker.go
+│   │   └── url_tracker_test.go
+│   ├── indexer/                # Page indexing & tokenization
+│   │   ├── tokenizer.go
+│   │   ├── tokenizer_test.go
+│   │   ├── word_processor.go
+│   │   └── word_processor_test.go
+│   └── storage/                # Persistent storage
+│       ├── file_storage.go
+│       └── file_storage_test.go
 ├── bin/                        # Compiled binaries (git-ignored)
 ├── .github/workflows/ci.yml   # CI pipeline (build, test, lint)
 ├── go.mod
@@ -110,11 +117,11 @@ A GitHub Actions workflow runs on every push and pull request to `main`:
 
 - [x] Implement HTTP fetching in `internal/network`
 - [x] Parse HTML and extract links
-- [ ] Implement BFS/DFS crawl strategy with depth & rate limiting
-- [ ] Build page indexer in `internal/indexer`
+- [x] Implement BFS/DFS crawl strategy with depth & rate limiting
+- [x] Build page indexer in `internal/indexer`
 - [ ] Implement search over indexed content
-- [ ] Add persistent storage for crawl results
-- [ ] Add concurrency with goroutines & channels
+- [x] Add persistent storage for crawl results
+- [x] Add concurrency with goroutines & channels
 
 ---
 
