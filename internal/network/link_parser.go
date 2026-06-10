@@ -69,16 +69,9 @@ func ExtractLinks(baseURL string, htmlBody string) ([]string, error) {
 }
 
 func isValidLink(link string) bool {
-	invalidPrefixes := []string{
-		"javascript:",
-		"mailto:",
-		"#",
-	}
-
-	for _, invalidPrefix := range invalidPrefixes {
-		if strings.HasPrefix(link, invalidPrefix) {
-			return false
-		}
-	}
-	return true
+	return !strings.HasPrefix(link, "javascript:") &&
+		!strings.HasPrefix(link, "mailto:") &&
+		!strings.HasPrefix(link, "#") &&
+		!strings.HasPrefix(link, "data:") &&
+		!strings.HasPrefix(link, "vbscript:")
 }

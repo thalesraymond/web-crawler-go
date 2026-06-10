@@ -38,6 +38,18 @@ func TestExtractLinks(t *testing.T) {
 			wantErr:   false,
 		},
 		{
+			name:    "links with data or vbscript",
+			baseURL: "https://example.com",
+			htmlBody: `
+			<html><body>
+			<a href="data:text/plain;base64,SGVsbG8sIFdvcmxkIQ==">Data link</a>
+			<a href="vbscript:alert(1)">VBScript link</a>
+			</body></html>
+			`,
+			wantLinks: []string{},
+			wantErr:   false,
+		},
+		{
 			name:    "invalid base url",
 			baseURL: "",
 			htmlBody: `
