@@ -75,8 +75,9 @@ func isValidLink(link string) bool {
 		"#",
 	}
 
+	lowerLink := strings.ToLower(link)
 	for _, invalidPrefix := range invalidPrefixes {
-		if strings.HasPrefix(link, invalidPrefix) {
+		if strings.HasPrefix(lowerLink, invalidPrefix) {
 			return false
 		}
 	}

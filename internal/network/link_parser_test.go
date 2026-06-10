@@ -38,6 +38,19 @@ func TestExtractLinks(t *testing.T) {
 			wantErr:   false,
 		},
 		{
+			name:    "links with mixed case schemes",
+			baseURL: "https://example.com",
+			htmlBody: `
+			<html><body>
+			<a href="JavaScript:alert(1)">Mixed case Javascript link</a>
+			<a href="MAILTO:test@example.com">Uppercase mailto link</a>
+			<a href="/page1">Valid link</a>
+			</body></html>
+			`,
+			wantLinks: []string{"https://example.com/page1"},
+			wantErr:   false,
+		},
+		{
 			name:    "invalid base url",
 			baseURL: "",
 			htmlBody: `
