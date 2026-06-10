@@ -77,8 +77,8 @@ func TestNewCrawler(t *testing.T) {
 	}
 }
 
-// TestGetResults_InitiallyEmpty verifies that a fresh Crawler has no results.
-func TestGetResults_InitiallyEmpty(t *testing.T) {
+// TestStorage_InitiallyEmpty verifies that a fresh Crawler has no results in storage.
+func TestStorage_InitiallyEmpty(t *testing.T) {
 	c := newCrawler(1, 5)
 	if got := c.storage.(*FakeStorage).results; len(got) != 0 {
 		t.Errorf("expected empty results, got %d", len(got))
