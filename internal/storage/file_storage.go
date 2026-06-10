@@ -40,6 +40,12 @@ func (s *FileStorage) Save(result *internal.CrawlResult) error {
 
 	filePath := filepath.Join(s.dataPath, encodedUrl+".json")
 
+	const permMkDir = os.FileMode(0755) // rwxr-xr-x for directories
+
+	if err := os.MkdirAll(s.dataPath, permMkDir); err != nil {
+		return err
+	}
+
 	const readWriteOwner = os.FileMode(0400) | os.FileMode(0200)
 	const readGroup = os.FileMode(0040)
 	const readOthers = os.FileMode(0004)
