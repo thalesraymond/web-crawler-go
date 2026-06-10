@@ -142,3 +142,55 @@ func contains(links []string, link string) bool {
 	}
 	return false
 }
+
+func TestIsValidLink(t *testing.T) {
+	tests := []struct {
+		name string
+		link string
+		want bool
+	}{
+		{
+			name: "valid http link",
+			link: "http://example.com",
+			want: true,
+		},
+		{
+			name: "valid https link",
+			link: "https://example.com",
+			want: true,
+		},
+		{
+			name: "valid relative link",
+			link: "/path/to/page",
+			want: true,
+		},
+		{
+			name: "valid link without scheme",
+			link: "example.com",
+			want: true,
+		},
+		{
+			name: "invalid javascript link",
+			link: "javascript:void(0)",
+			want: false,
+		},
+		{
+			name: "invalid mailto link",
+			link: "mailto:test@example.com",
+			want: false,
+		},
+		{
+			name: "invalid fragment link",
+			link: "#section1",
+			want: false,
+		},
+	}
+
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			if got := isValidLink(tt.link); got != tt.want {
+				t.Errorf("isValidLink() = %v, want %v", got, tt.want)
+			}
+		})
+	}
+}
