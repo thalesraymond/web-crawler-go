@@ -11,8 +11,9 @@ type PageToken struct {
 	Count int
 }
 
-func isInvalidTag(tagName string) bool {
-	return tagName == "script" || tagName == "style" || tagName == "nav" || tagName == "footer" || tagName == "header" || tagName == "aside"
+func isInvalidTagBytes(tagName []byte) bool {
+	s := string(tagName)
+	return s == "script" || s == "style" || s == "nav" || s == "footer" || s == "header" || s == "aside"
 }
 
 func ExtractPageTokens(htmlBody string) []PageToken {
@@ -29,15 +30,17 @@ func ExtractPageTokens(htmlBody string) []PageToken {
 
 		if tokenType == html.StartTagToken {
 			name, _ := tokenizer.TagName()
-			if isInvalidTag(string(name)) {
+			if isInvalidTagBytes(name) {
 				insideInvalidTags++
 			}
 		}
 
 		if tokenType == html.EndTagToken {
 			name, _ := tokenizer.TagName()
-			if isInvalidTag(string(name)) {
-				insideInvalidTags--
+			if isInvalidTagBytes(name) {
+				if insideInvalidTags > 0 {
+					insideInvalidTags--
+				}
 			}
 		}
 
