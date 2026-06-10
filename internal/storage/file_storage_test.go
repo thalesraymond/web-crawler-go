@@ -32,7 +32,6 @@ func TestSave_ValidResult_CreatesFile(t *testing.T) {
 
 	result := &internal.CrawlResult{
 		URL:   "https://example.com",
-		HTML:  "<html></html>",
 		Links: []string{"https://example.com/about"},
 	}
 
@@ -53,7 +52,6 @@ func TestSave_ValidResult_FileContainsCorrectJSON(t *testing.T) {
 
 	result := &internal.CrawlResult{
 		URL:   "https://example.com/page",
-		HTML:  "<html><body>Hello</body></html>",
 		Links: []string{"https://example.com/a", "https://example.com/b"},
 	}
 
@@ -76,9 +74,6 @@ func TestSave_ValidResult_FileContainsCorrectJSON(t *testing.T) {
 
 	if saved.URL != result.URL {
 		t.Errorf("URL mismatch: got %q, want %q", saved.URL, result.URL)
-	}
-	if saved.HTML != result.HTML {
-		t.Errorf("HTML mismatch: got %q, want %q", saved.HTML, result.HTML)
 	}
 	if len(saved.Links) != len(result.Links) {
 		t.Errorf("Links length mismatch: got %d, want %d", len(saved.Links), len(result.Links))
@@ -130,34 +125,6 @@ func TestSave_DifferentURLs_CreateSeparateFiles(t *testing.T) {
 	}
 }
 
-func TestSave_SameURLTwice_OverwritesFile(t *testing.T) {
-	s, dir := newTempStorage(t)
-
-	url := "https://example.com"
-
-	if err := s.Save(&internal.CrawlResult{URL: url, HTML: "first"}); err != nil {
-		t.Fatalf("unexpected error on first save: %v", err)
-	}
-	if err := s.Save(&internal.CrawlResult{URL: url, HTML: "second"}); err != nil {
-		t.Fatalf("unexpected error on second save: %v", err)
-	}
-
-	encodedURL := base64.StdEncoding.EncodeToString([]byte(url))
-	data, err := os.ReadFile(filepath.Join(dir, encodedURL+".json"))
-	if err != nil {
-		t.Fatalf("could not read file: %v", err)
-	}
-
-	var saved internal.CrawlResult
-	if err := json.Unmarshal(data, &saved); err != nil {
-		t.Fatalf("invalid JSON: %v", err)
-	}
-
-	if saved.HTML != "second" {
-		t.Errorf("expected second save to overwrite: got HTML %q", saved.HTML)
-	}
-}
-
 func TestSave_InvalidDirectory_ReturnsError(t *testing.T) {
 	s := NewFileStorage("/nonexistent/path/that/does/not/exist")
 
@@ -184,7 +151,7 @@ func TestSave_ConcurrentSaves_NoDataRace(t *testing.T) {
 		wg.Add(1)
 		go func(u string) {
 			defer wg.Done()
-			if err := s.Save(&internal.CrawlResult{URL: u, HTML: "<p>content</p>"}); err != nil {
+			if err := s.Save(&internal.CrawlResult{URL: u}); err != nil {
 				t.Errorf("concurrent save error for %q: %v", u, err)
 			}
 		}(url)

@@ -32,7 +32,6 @@ type Crawler struct {
 
 type CrawlResult struct {
 	URL    string              `json:"url"`
-	HTML   string              `json:"html"`
 	Links  []string            `json:"links"`
 	Tokens []indexer.PageToken `json:"tokens"`
 	Error  error               `json:"error"`
@@ -152,7 +151,6 @@ func (c *Crawler) crawlURL(url string) {
 
 	c.currentResult <- &CrawlResult{
 		URL:    url,
-		HTML:   html,
 		Links:  urls,
 		Tokens: tokens,
 		Error:  nil,
