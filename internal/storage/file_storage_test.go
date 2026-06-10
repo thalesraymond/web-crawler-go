@@ -39,7 +39,7 @@ func TestSave_ValidResult_CreatesFile(t *testing.T) {
 		t.Fatalf("unexpected error: %v", err)
 	}
 
-	encodedURL := base64.StdEncoding.EncodeToString([]byte(result.URL))
+	encodedURL := base64.URLEncoding.EncodeToString([]byte(result.URL))
 	expectedPath := filepath.Join(dir, encodedURL+".json")
 
 	if _, err := os.Stat(expectedPath); os.IsNotExist(err) {
@@ -59,7 +59,7 @@ func TestSave_ValidResult_FileContainsCorrectJSON(t *testing.T) {
 		t.Fatalf("unexpected error: %v", err)
 	}
 
-	encodedURL := base64.StdEncoding.EncodeToString([]byte(result.URL))
+	encodedURL := base64.URLEncoding.EncodeToString([]byte(result.URL))
 	filePath := filepath.Join(dir, encodedURL+".json")
 
 	data, err := os.ReadFile(filePath)
@@ -92,7 +92,7 @@ func TestSave_FileNameIsBase64EncodedURL(t *testing.T) {
 		t.Fatalf("unexpected error: %v", err)
 	}
 
-	expectedName := base64.StdEncoding.EncodeToString([]byte(url)) + ".json"
+	expectedName := base64.URLEncoding.EncodeToString([]byte(url)) + ".json"
 	expectedPath := filepath.Join(dir, expectedName)
 
 	if _, err := os.Stat(expectedPath); os.IsNotExist(err) {
@@ -168,7 +168,7 @@ func TestSave_FilePermissions_Are644(t *testing.T) {
 		t.Fatalf("unexpected error: %v", err)
 	}
 
-	encodedURL := base64.StdEncoding.EncodeToString([]byte(result.URL))
+	encodedURL := base64.URLEncoding.EncodeToString([]byte(result.URL))
 	filePath := filepath.Join(dir, encodedURL+".json")
 
 	info, err := os.Stat(filePath)
