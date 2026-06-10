@@ -99,6 +99,14 @@ func TestExtractPageTokens(t *testing.T) {
 			},
 		},
 		{
+			name:     "case sensitive invalid tags",
+			htmlBody: "<SCRIPT>var x = 1;</SCRIPT>hello<STYLE>body { color: red; }</STYLE>world<NaV>nav_text</nAv>!",
+			want: []PageToken{
+				{Word: "hello", Count: 1},
+				{Word: "world", Count: 1},
+			},
+		},
+		{
 			name:     "ignored nav, footer, header, aside",
 			htmlBody: "<header>header_text</header><nav>nav_text</nav>main_content<footer>footer_text</footer><aside>aside_text</aside>",
 			want: []PageToken{
