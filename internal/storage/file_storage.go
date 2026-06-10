@@ -44,7 +44,7 @@ func (s *FileStorage) Save(result *internal.CrawlResult) error {
 	const readGroup = os.FileMode(0040)
 	const readOthers = os.FileMode(0004)
 
-	var perm644 os.FileMode = readWriteOwner | readGroup | readOthers
+	var perm644 = readWriteOwner | readGroup | readOthers
 
 	if err := os.WriteFile(filePath, jsonData, perm644); err != nil {
 		return err
