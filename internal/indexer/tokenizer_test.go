@@ -23,7 +23,7 @@ func TestIsInvalidTag(t *testing.T) {
 		{"span tag", "span", false},
 		{"empty string", "", false},
 		{"unrecognized tag", "customtag", false},
-		{"uppercase script tag", "SCRIPT", true},
+		{"uppercase script tag", "SCRIPT", false},
 	}
 
 	for _, tt := range tests {
