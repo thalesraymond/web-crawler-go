@@ -7,8 +7,8 @@ import (
 )
 
 type PageToken struct {
-	Word  string
-	Count int
+	Word  string `json:"word"`
+	Count int    `json:"count"`
 }
 
 func isInvalidTag(tagName string) bool {

@@ -10,6 +10,20 @@ import (
 	"github.com/thalesraymond/web-crawler-go/internal/network"
 )
 
+// fake storage to mock Save
+type FakeStorage struct {
+	results []*CrawlResult
+}
+
+func NewFakeStorage() *FakeStorage {
+	return &FakeStorage{}
+}
+
+func (f *FakeStorage) Save(result *CrawlResult) error {
+	f.results = append(f.results, result)
+	return nil
+}
+
 // newTestServer creates an httptest.Server whose handler is provided by the caller.
 // The server is automatically closed when the test ends.
 func newTestServer(t *testing.T, handler http.HandlerFunc) *httptest.Server {
@@ -34,7 +48,8 @@ func htmlPage(links ...string) string {
 func newCrawler(concurrency, pageLimit int) *Crawler {
 	client := network.NewCrawlerClient()
 	tracker := network.NewURLTracker()
-	c := NewCrawler(client, tracker, concurrency, pageLimit)
+	storage := NewFakeStorage()
+	c := NewCrawler(client, tracker, concurrency, pageLimit, storage)
 	c.crawlDelay = 0
 	return c
 }
@@ -43,7 +58,7 @@ func newCrawler(concurrency, pageLimit int) *Crawler {
 func TestNewCrawler(t *testing.T) {
 	client := network.NewCrawlerClient()
 	tracker := network.NewURLTracker()
-	c := NewCrawler(client, tracker, 3, 10)
+	c := NewCrawler(client, tracker, 3, 10, NewFakeStorage())
 
 	if c == nil {
 		t.Fatal("NewCrawler returned nil")
@@ -65,7 +80,7 @@ func TestNewCrawler(t *testing.T) {
 // TestGetResults_InitiallyEmpty verifies that a fresh Crawler has no results.
 func TestGetResults_InitiallyEmpty(t *testing.T) {
 	c := newCrawler(1, 5)
-	if got := c.GetResults(); len(got) != 0 {
+	if got := c.storage.(*FakeStorage).results; len(got) != 0 {
 		t.Errorf("expected empty results, got %d", len(got))
 	}
 }
@@ -80,7 +95,7 @@ func TestStart_SinglePage(t *testing.T) {
 	c := newCrawler(1, 5)
 	c.Start(srv.URL)
 
-	results := c.GetResults()
+	results := c.storage.(*FakeStorage).results
 	if len(results) != 1 {
 		t.Fatalf("expected 1 result, got %d", len(results))
 	}
@@ -112,7 +127,7 @@ func TestStart_PageLimit(t *testing.T) {
 	c := newCrawler(2, limit)
 	c.Start(srv.URL)
 
-	results := c.GetResults()
+	results := c.storage.(*FakeStorage).results
 	if len(results) > limit {
 		t.Errorf("page limit not respected: got %d results, limit was %d", len(results), limit)
 	}
@@ -151,7 +166,7 @@ func TestStart_HTTPError(t *testing.T) {
 	c := newCrawler(1, 5)
 	c.Start(srv.URL)
 
-	results := c.GetResults()
+	results := c.storage.(*FakeStorage).results
 	if len(results) != 0 {
 		t.Errorf("expected 0 results for error page, got %d", len(results))
 	}
@@ -175,7 +190,7 @@ func TestStart_LinksExtracted(t *testing.T) {
 	c := newCrawler(2, 10)
 	c.Start(srv.URL)
 
-	results := c.GetResults()
+	results := c.storage.(*FakeStorage).results
 	if len(results) != 3 {
 		t.Errorf("expected 3 results (root + 2 children), got %d", len(results))
 	}
@@ -204,7 +219,7 @@ func TestStart_ConcurrentWorkers(t *testing.T) {
 	c := newCrawler(4, numPages+1)
 	c.Start(srv.URL)
 
-	results := c.GetResults()
+	results := c.storage.(*FakeStorage).results
 	// We expect the root page plus up to numPages children.
 	if len(results) == 0 {
 		t.Error("expected results with concurrent workers, got none")
@@ -221,7 +236,7 @@ func TestStart_ResultContainsTokens(t *testing.T) {
 	c := newCrawler(1, 5)
 	c.Start(srv.URL)
 
-	results := c.GetResults()
+	results := c.storage.(*FakeStorage).results
 	if len(results) == 0 {
 		t.Fatal("expected at least one result")
 	}
@@ -242,7 +257,7 @@ func TestStart_ResultContainsHTML(t *testing.T) {
 	c := newCrawler(1, 5)
 	c.Start(srv.URL)
 
-	results := c.GetResults()
+	results := c.storage.(*FakeStorage).results
 	if len(results) == 0 {
 		t.Fatal("expected at least one result")
 	}

@@ -12,6 +12,10 @@ import (
 
 const MaxWorkers = 10
 
+type ResultStorage interface {
+	Save(result *CrawlResult) error
+}
+
 type Crawler struct {
 	client        *network.CrawlerClient
 	urlTracker    *network.URLTracker
@@ -20,32 +24,28 @@ type Crawler struct {
 	done          chan struct{}
 	pageLimit     int
 	crawlDelay    time.Duration
+	storage       ResultStorage
 	currentResult chan *CrawlResult
 	workerWg      sync.WaitGroup
 	sendWg        sync.WaitGroup
-
-	results []*CrawlResult
 }
 
 type CrawlResult struct {
-	URL    string
-	HTML   string
-	Links  []string
-	Tokens []indexer.PageToken
-	Error  error
+	URL    string              `json:"url"`
+	HTML   string              `json:"html"`
+	Links  []string            `json:"links"`
+	Tokens []indexer.PageToken `json:"tokens"`
+	Error  error               `json:"error"`
 }
 
-func (c *Crawler) GetResults() []*CrawlResult {
-	return c.results
-}
-
-func NewCrawler(client *network.CrawlerClient, urlTracker *network.URLTracker, concurrency int, pageLimit int) *Crawler {
+func NewCrawler(client *network.CrawlerClient, urlTracker *network.URLTracker, concurrency int, pageLimit int, storage ResultStorage) *Crawler {
 	return &Crawler{
 		client:      client,
 		urlTracker:  urlTracker,
 		concurrency: concurrency,
 		pageLimit:   pageLimit,
 		crawlDelay:  1000 * time.Millisecond,
+		storage:     storage,
 	}
 }
 
@@ -55,6 +55,8 @@ func (c *Crawler) Start(seedUrl string) {
 	c.currentResult = make(chan *CrawlResult, c.pageLimit)
 	c.queue = make(chan string, c.pageLimit)
 	c.done = make(chan struct{})
+
+	totalCrawled := 0
 
 	c.workerWg.Add(c.concurrency)
 	for i := 0; i < c.concurrency; i++ {
@@ -66,7 +68,7 @@ func (c *Crawler) Start(seedUrl string) {
 
 	linksToProcess := 1 // Will prevent workers from hanging if total links is less than page limit
 
-	for linksToProcess > 0 && len(c.results) < c.pageLimit {
+	for linksToProcess > 0 && totalCrawled < c.pageLimit {
 		linksToProcess--
 		result := <-c.currentResult
 
@@ -76,10 +78,15 @@ func (c *Crawler) Start(seedUrl string) {
 			continue
 		}
 
-		c.results = append(c.results, result)
+		totalCrawled++
+
+		//save
+		if err := c.storage.Save(result); err != nil {
+			log.Printf("Error saving result: %v", err)
+		}
 
 		for _, link := range result.Links {
-			if len(c.results)+linksToProcess >= c.pageLimit {
+			if totalCrawled+linksToProcess >= c.pageLimit {
 				break
 			}
 
