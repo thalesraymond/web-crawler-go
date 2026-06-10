@@ -7,6 +7,7 @@ import (
 
 	"github.com/thalesraymond/web-crawler-go/internal"
 	"github.com/thalesraymond/web-crawler-go/internal/network"
+	"github.com/thalesraymond/web-crawler-go/internal/storage"
 )
 
 func runCrawl(args []string) {
@@ -26,31 +27,17 @@ func runCrawl(args []string) {
 		os.Exit(1)
 	}
 
+	// save to project directory data folder
 	crawler := internal.NewCrawler(
 		network.NewCrawlerClient(),
 		network.NewURLTracker(),
 		5,
 		*pageLimit,
+		storage.NewFileStorage("./data"),
 	)
 
 	fmt.Println("Crawling website:", *seedUrl)
 	fmt.Println("Max pages to crawl:", *pageLimit)
 
 	crawler.Start(*seedUrl)
-
-	results := crawler.GetResults()
-
-	for i, result := range results {
-		if result.Error != nil {
-			fmt.Printf("%d. URL: %s\n", i+1, result.URL)
-			fmt.Printf("   Error: %s\n", result.Error)
-			continue
-		}
-
-		fmt.Printf("%d. URL: %s\n", i+1, result.URL)
-		fmt.Printf("   Tokens: %d\n", len(result.Tokens))
-		fmt.Printf("   Links: %d\n", len(result.Links))
-		fmt.Println()
-	}
-
 }
