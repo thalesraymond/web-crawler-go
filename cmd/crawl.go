@@ -3,6 +3,7 @@ package main
 import (
 	"flag"
 	"fmt"
+	"log"
 	"os"
 
 	"github.com/thalesraymond/web-crawler-go/internal"
@@ -27,13 +28,20 @@ func runCrawl(args []string) {
 		os.Exit(1)
 	}
 
+	// Load or create the inverted index, preserving previous crawl sessions.
+	index, err := storage.LoadOrCreate("./data/index.json")
+	if err != nil {
+		log.Fatalf("Error loading index: %v", err)
+	}
+
 	// save to project directory data folder
 	crawler := internal.NewCrawler(
 		network.NewCrawlerClient(),
 		network.NewURLTracker(),
-		5,
+		20,
 		*pageLimit,
 		storage.NewFileStorage("./data"),
+		index,
 	)
 
 	fmt.Println("Crawling website:", *seedUrl)
