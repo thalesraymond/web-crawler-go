@@ -26,13 +26,13 @@ func TestProcessWord(t *testing.T) {
 		},
 		{
 			name:        "word with accents",
-			rawWord:     "olá",
+			rawWord:     "olá)",
 			wantedWord:  "ola",
 			wantedError: nil,
 		},
 		{
 			name:        "word with uppercase",
-			rawWord:     "EITA",
+			rawWord:     ".EITA",
 			wantedWord:  "eita",
 			wantedError: nil,
 		},

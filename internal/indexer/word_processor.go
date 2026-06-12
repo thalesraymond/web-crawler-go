@@ -39,8 +39,8 @@ func ProcessWord(word string) (string, error) {
 		return "", fmt.Errorf("word contains more than one word")
 	}
 
-	cleanWord = strings.TrimRightFunc(cleanWord, func(r rune) bool {
-		return unicode.IsPunct(r) || unicode.IsSymbol(r)
+	cleanWord = strings.TrimFunc(cleanWord, func(r rune) bool {
+		return unicode.IsPunct(r) || unicode.IsSymbol(r) || unicode.IsMark(r) || unicode.IsDigit(r)
 	})
 
 	wordWithoutAccents, _, err := transform.String(newNormalizer(), cleanWord)
