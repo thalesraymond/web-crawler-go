@@ -40,8 +40,8 @@ func TestFileIndex_Add_MultiplePages(t *testing.T) {
 func TestFileIndex_Add_NoDuplicateURL(t *testing.T) {
 	fi := newFileIndex("")
 
-	fi.Add(makeResult("https://a.com", map[string]int{"golang": 3}))
-	fi.Add(makeResult("https://a.com", map[string]int{"golang": 9})) // re-crawl same page
+	fi.Add(makeResult("https://a.com", map[string]int{"golang": 3})) // nolint:errcheck
+	fi.Add(makeResult("https://a.com", map[string]int{"golang": 9})) // nolint:errcheck
 
 	postings := fi.entries["golang"]
 	if len(postings) != 1 {
@@ -84,12 +84,12 @@ func TestFileIndex_RoundTrip(t *testing.T) {
 	if err != nil {
 		t.Fatal(err)
 	}
-	tmp.Close()
-	defer os.Remove(tmp.Name())
+	tmp.Close() // nolint:errcheck
+	defer os.Remove(tmp.Name()) // nolint:errcheck
 
 	fi := newFileIndex(tmp.Name())
-	fi.Add(makeResult("https://a.com", map[string]int{"wikipedia": 5}))
-	fi.Add(makeResult("https://b.com", map[string]int{"wikipedia": 2, "golang": 8}))
+	fi.Add(makeResult("https://a.com", map[string]int{"wikipedia": 5})) // nolint:errcheck
+	fi.Add(makeResult("https://b.com", map[string]int{"wikipedia": 2, "golang": 8})) // nolint:errcheck
 
 	if err := fi.Save(); err != nil {
 		t.Fatalf("Save failed: %v", err)
@@ -126,9 +126,9 @@ func TestFileIndex_LoadOrCreate_CorruptFile(t *testing.T) {
 	if err != nil {
 		t.Fatal(err)
 	}
-	tmp.WriteString("NOT VALID JSON{{{{")
-	tmp.Close()
-	defer os.Remove(tmp.Name())
+	tmp.WriteString("NOT VALID JSON{{{{") // nolint:errcheck
+	tmp.Close()                      // nolint:errcheck
+	defer os.Remove(tmp.Name())      // nolint:errcheck
 
 	fi, err := LoadOrCreate(tmp.Name())
 	if err != nil {
@@ -145,7 +145,7 @@ func TestFileIndex_LoadOrCreate_CorruptFile(t *testing.T) {
 
 func TestFileIndex_Lookup_ExistingWord(t *testing.T) {
 	fi := newFileIndex("")
-	fi.Add(makeResult("https://a.com", map[string]int{"wikipedia": 3}))
+	fi.Add(makeResult("https://a.com", map[string]int{"wikipedia": 3})) // nolint:errcheck
 
 	entries, err := fi.Lookup("wikipedia")
 	if err != nil {
@@ -179,7 +179,7 @@ func TestFileIndex_Lookup_StopWord(t *testing.T) {
 
 func TestFileIndex_Lookup_ReturnsCopy(t *testing.T) {
 	fi := newFileIndex("")
-	fi.Add(makeResult("https://a.com", map[string]int{"golang": 5}))
+	fi.Add(makeResult("https://a.com", map[string]int{"golang": 5})) // nolint:errcheck
 
 	entries, _ := fi.Lookup("golang")
 	entries[0].Count = 999 // mutate returned slice
@@ -203,7 +203,7 @@ func TestFileIndex_Add_Concurrent(t *testing.T) {
 		go func(n int) {
 			defer wg.Done()
 			url := "https://page.com/" + string(rune('a'+n%26))
-			fi.Add(makeResult(url, map[string]int{"concurrent": 1}))
+			fi.Add(makeResult(url, map[string]int{"concurrent": 1})) // nolint:errcheck
 		}(i)
 	}
 
