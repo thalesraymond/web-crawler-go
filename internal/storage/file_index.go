@@ -128,3 +128,19 @@ func (fi *FileIndex) Lookup(word string) ([]internal.IndexEntry, error) {
 	copy(result, entries)
 	return result, nil
 }
+
+// GetRandomIndexedURL returns a randomly selected URL from the existing index.
+// If the index is empty, it returns an empty string and false.
+func (fi *FileIndex) GetRandomIndexedURL() (string, bool) {
+	fi.mu.Lock()
+	defer fi.mu.Unlock()
+
+	for _, entries := range fi.entries {
+		if len(entries) > 0 {
+			// Map iteration order is pseudo-random in Go.
+			// Returning the first URL we encounter is sufficient.
+			return entries[0].UrlString, true
+		}
+	}
+	return "", false
+}
