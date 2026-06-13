@@ -57,11 +57,17 @@ func TestRunSearch_Success(t *testing.T) {
 	}
 
 	// Create a dummy file index structure at ./data/index.json
-	os.MkdirAll("./data", 0755)
+	if err := os.MkdirAll("./data", 0755); err != nil {
+		t.Fatalf("failed to create data dir: %v", err)
+	}
 	dummyIndexContent := `{"testword": [{"url_string": "http://example.com", "count": 5}]}`
-	os.WriteFile("./data/index.json", []byte(dummyIndexContent), 0644)
+	if err := os.WriteFile("./data/index.json", []byte(dummyIndexContent), 0644); err != nil {
+		t.Fatalf("failed to write dummy index: %v", err)
+	}
 	// Clean it up after the test runs
-	defer os.Remove("./data/index.json")
+	defer func() {
+		_ = os.Remove("./data/index.json")
+	}()
 
 	cmd := exec.Command(os.Args[0], "-test.run=TestRunSearch_Success")
 	cmd.Env = append(os.Environ(), "TEST_RUN_SEARCH_SUCCESS=1")
