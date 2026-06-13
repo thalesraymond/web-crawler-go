@@ -15,6 +15,7 @@ func runCrawl(args []string) {
 	crawlCmd := flag.NewFlagSet("crawl", flag.ExitOnError)
 	seedUrl := crawlCmd.String("seed", "", "Root URL to start crawling from. If omitted, uses random page from index or default Wikipedia page.")
 	pageLimit := crawlCmd.Int("limit", 5, "Max number of pages to crawl")
+	indexType := crawlCmd.String("index-type", "file", "Type of index to use: 'file' (in-memory JSON) or 'bolt' (BoltDB)")
 
 	_ = crawlCmd.Parse(args) // Error handling is done by flag package, so we can ignore the error here
 
@@ -23,8 +24,21 @@ func runCrawl(args []string) {
 		os.Exit(1)
 	}
 
-	// Load or create the inverted index, preserving previous crawl sessions.
-	index, err := storage.LoadOrCreate("./data/index.json")
+	// Define local interface to abstract the index implementation
+	type AppIndex interface {
+		internal.IndexWriter
+		GetRandomIndexedURL() (string, bool)
+	}
+
+	var index AppIndex
+	var err error
+
+	if *indexType == "bolt" {
+		index, err = storage.LoadOrCreateBolt("./data/index.db")
+	} else {
+		index, err = storage.LoadOrCreate("./data/index.json")
+	}
+
 	if err != nil {
 		log.Fatalf("Error loading index: %v", err)
 	}
