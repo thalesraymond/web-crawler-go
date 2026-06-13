@@ -2,7 +2,7 @@
 
 A simple web crawler written in Go that simulates "Google-like" indexing. Built as the first personal project for the [Boot.dev](https://www.boot.dev/) course.
 
-> **Status:** 🚧 Work in progress — the core crawling, indexing, and persistent storage are implemented. Search functionality is currently being built.
+> **Status:** Completed (Local db and pure file system indexing)
 
 ---
 
@@ -119,7 +119,7 @@ A GitHub Actions workflow runs on every push and pull request to `main`:
 - [x] Parse HTML and extract links
 - [x] Implement BFS/DFS crawl strategy with depth & rate limiting
 - [x] Build page indexer in `internal/indexer`
-- [ ] Implement search over indexed content
+- [x] Implement search over indexed content
 - [x] Add persistent storage for crawl results
 - [x] Add concurrency with goroutines & channels
 
