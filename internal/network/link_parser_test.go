@@ -204,6 +204,31 @@ func TestIsValidLink(t *testing.T) {
 			link: "",
 			want: true,
 		},
+		{
+			name: "valid ftp link",
+			link: "ftp://example.com/file",
+			want: true,
+		},
+		{
+			name: "valid ws link",
+			link: "ws://example.com/socket",
+			want: true,
+		},
+		{
+			name: "invalid javascript uppercase",
+			link: "JAVASCRIPT:alert(1)",
+			want: false,
+		},
+		{
+			name: "invalid mailto uppercase",
+			link: "MAILTO:admin@localhost",
+			want: false,
+		},
+		{
+			name: "invalid fragment uppercase",
+			link: "#SECTION",
+			want: false,
+		},
 	}
 
 	for _, tt := range tests {
