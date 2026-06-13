@@ -7,7 +7,34 @@ import (
 	"net/http/httptest"
 	"strings"
 	"testing"
+	"time"
 )
+
+func TestNewCrawlerClient(t *testing.T) {
+	client := NewCrawlerClient()
+
+	if client == nil {
+		t.Fatal("expected non-nil CrawlerClient")
+	}
+
+	expectedUserAgent := "raymond-go-crawler/1.0"
+	if client.userAgent != expectedUserAgent {
+		t.Errorf("expected userAgent %q, got %q", expectedUserAgent, client.userAgent)
+	}
+
+	expectedTimeout := 10 * time.Second
+	if client.timeout != expectedTimeout {
+		t.Errorf("expected timeout %v, got %v", expectedTimeout, client.timeout)
+	}
+
+	if client.httpClient == nil {
+		t.Fatal("expected non-nil httpClient")
+	}
+
+	if client.httpClient.Timeout != expectedTimeout {
+		t.Errorf("expected httpClient.Timeout %v, got %v", expectedTimeout, client.httpClient.Timeout)
+	}
+}
 
 func TestFetchHTML(t *testing.T) {
 	client := NewCrawlerClient()
