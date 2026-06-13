@@ -184,6 +184,26 @@ func TestIsValidLink(t *testing.T) {
 			link: "#section1",
 			want: false,
 		},
+		{
+			name: "invalid fragment only",
+			link: "#",
+			want: false,
+		},
+		{
+			name: "invalid javascript mixed case",
+			link: "JaVaScRiPt:void(0)",
+			want: false,
+		},
+		{
+			name: "invalid mailto mixed case",
+			link: "MaIlTo:test@example.com",
+			want: false,
+		},
+		{
+			name: "empty link",
+			link: "",
+			want: true,
+		},
 	}
 
 	for _, tt := range tests {
