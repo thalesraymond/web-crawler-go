@@ -122,7 +122,7 @@ func TestRunSearch_MultipleResults(t *testing.T) {
 		t.Fatalf("expected all urls in output, got: %s", outStr)
 	}
 
-	if !(idxA < idxB && idxB < idxC) {
+	if idxA >= idxB || idxB >= idxC {
 		t.Errorf("expected results to be sorted by count (a:5, b:2, c:1), but got order a:%d, b:%d, c:%d in output: %s", idxA, idxB, idxC, outStr)
 	}
 }
