@@ -16,6 +16,14 @@ type ResultStorage interface {
 	Save(result *CrawlResult) error
 }
 
+// IndexWriter is the write side of the inverted index.
+// Defined here (at the consumer) so any backing implementation —
+// JSON file, database, etc. — can be swapped without touching this package.
+type IndexWriter interface {
+	Add(result *CrawlResult) error
+	Save() error
+}
+
 type Crawler struct {
 	client        *network.CrawlerClient
 	urlTracker    *network.URLTracker
@@ -25,6 +33,7 @@ type Crawler struct {
 	pageLimit     int
 	crawlDelay    time.Duration
 	storage       ResultStorage
+	indexer       IndexWriter
 	currentResult chan *CrawlResult
 	workerWg      sync.WaitGroup
 	sendWg        sync.WaitGroup
@@ -37,9 +46,12 @@ type CrawlResult struct {
 	Error  error               `json:"error"`
 }
 
-func NewCrawler(client *network.CrawlerClient, urlTracker *network.URLTracker, concurrency int, pageLimit int, storage ResultStorage) *Crawler {
+func NewCrawler(client *network.CrawlerClient, urlTracker *network.URLTracker, concurrency int, pageLimit int, storage ResultStorage, indexer IndexWriter) *Crawler {
 	if storage == nil {
 		log.Panic("storage passed on NewCrawler must not be nil!")
+	}
+	if indexer == nil {
+		log.Panic("indexer passed on NewCrawler must not be nil!")
 	}
 	return &Crawler{
 		client:      client,
@@ -48,6 +60,7 @@ func NewCrawler(client *network.CrawlerClient, urlTracker *network.URLTracker, c
 		pageLimit:   pageLimit,
 		crawlDelay:  1000 * time.Millisecond,
 		storage:     storage,
+		indexer:     indexer,
 	}
 }
 
@@ -87,6 +100,10 @@ func (c *Crawler) Start(seedUrl string) {
 			log.Printf("Error saving result: %v", err)
 		}
 
+		if err := c.indexer.Add(result); err != nil {
+			log.Printf("Error indexing result: %v", err)
+		}
+
 		for _, link := range result.Links {
 			if totalCrawled+linksToProcess >= c.pageLimit {
 				break
@@ -116,6 +133,11 @@ func (c *Crawler) Start(seedUrl string) {
 	close(c.queue)
 	c.workerWg.Wait()
 	close(c.currentResult)
+
+	// Persist the index once all pages have been processed.
+	if err := c.indexer.Save(); err != nil {
+		log.Printf("Error saving index: %v", err)
+	}
 }
 
 func (c *Crawler) worker() {

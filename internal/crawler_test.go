@@ -24,6 +24,12 @@ func (f *FakeStorage) Save(result *CrawlResult) error {
 	return nil
 }
 
+// FakeIndexer is a no-op IndexWriter used in tests.
+type FakeIndexer struct{}
+
+func (f *FakeIndexer) Add(_ *CrawlResult) error { return nil }
+func (f *FakeIndexer) Save() error               { return nil }
+
 // newTestServer creates an httptest.Server whose handler is provided by the caller.
 // The server is automatically closed when the test ends.
 func newTestServer(t *testing.T, handler http.HandlerFunc) *httptest.Server {
@@ -49,7 +55,7 @@ func newCrawler(concurrency, pageLimit int) *Crawler {
 	client := network.NewCrawlerClient()
 	tracker := network.NewURLTracker()
 	storage := NewFakeStorage()
-	c := NewCrawler(client, tracker, concurrency, pageLimit, storage)
+	c := NewCrawler(client, tracker, concurrency, pageLimit, storage, &FakeIndexer{})
 	c.crawlDelay = 0
 	return c
 }
@@ -58,7 +64,7 @@ func newCrawler(concurrency, pageLimit int) *Crawler {
 func TestNewCrawler(t *testing.T) {
 	client := network.NewCrawlerClient()
 	tracker := network.NewURLTracker()
-	c := NewCrawler(client, tracker, 3, 10, NewFakeStorage())
+	c := NewCrawler(client, tracker, 3, 10, NewFakeStorage(), &FakeIndexer{})
 
 	if c == nil {
 		t.Fatal("NewCrawler returned nil")
