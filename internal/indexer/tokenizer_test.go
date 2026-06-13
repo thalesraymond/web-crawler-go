@@ -24,6 +24,17 @@ func TestIsInvalidTag(t *testing.T) {
 		{"empty string", "", false},
 		{"unrecognized tag", "customtag", false},
 		{"uppercase script tag", "SCRIPT", true},
+		{"uppercase style tag", "STYLE", true},
+		{"uppercase nav tag", "NAV", true},
+		{"uppercase footer tag", "FOOTER", true},
+		{"uppercase header tag", "HEADER", true},
+		{"uppercase aside tag", "ASIDE", true},
+		{"mixedcase script tag", "sCrIpT", true},
+		{"mixedcase style tag", "StYlE", true},
+		{"mixedcase nav tag", "NaV", true},
+		{"mixedcase footer tag", "fOoTeR", true},
+		{"mixedcase header tag", "HeAdEr", true},
+		{"mixedcase aside tag", "aSiDe", true},
 	}
 
 	for _, tt := range tests {
@@ -33,6 +44,23 @@ func TestIsInvalidTag(t *testing.T) {
 			}
 		})
 	}
+}
+
+func FuzzIsInvalidTag(f *testing.F) {
+	// Add seed corpus for fuzzer
+	seedCorpus := []string{
+		"script", "STYLE", "nav", "fOoTeR", "header", "ASIDE",
+		"div", "p", "span", "", "customtag", "SCRIPT",
+	}
+	for _, seed := range seedCorpus {
+		f.Add(seed)
+	}
+
+	f.Fuzz(func(t *testing.T, tagName string) {
+		// The goal of the fuzz test is to ensure isInvalidTag doesn't panic
+		// and consistently returns a bool for any random string.
+		_ = isInvalidTag(tagName)
+	})
 }
 
 func TestExtractPageTokens(t *testing.T) {
