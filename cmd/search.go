@@ -15,11 +15,13 @@ import (
 // Defined here (at the consumer) so any backing implementation can be swapped.
 type IndexReader interface {
 	Lookup(word string) ([]internal.IndexEntry, error)
+	Close() error
 }
 
 func runSearch(args []string) {
 	searchCmd := flag.NewFlagSet("search", flag.ExitOnError)
 	searchQuery := searchCmd.String("query", "", "Search query to search for")
+	indexType := searchCmd.String("index-type", "file", "Type of index to use: 'file' (in-memory JSON) or 'bolt' (BoltDB)")
 	_ = searchCmd.Parse(args)
 
 	if *searchQuery == "" {
@@ -27,10 +29,19 @@ func runSearch(args []string) {
 		os.Exit(1)
 	}
 
-	index, err := storage.LoadOrCreate("./data/index.json")
+	var index IndexReader
+	var err error
+
+	if *indexType == "bolt" {
+		index, err = storage.LoadOrCreateBolt("./data/index.db")
+	} else {
+		index, err = storage.LoadOrCreate("./data/index.json")
+	}
+
 	if err != nil {
 		log.Fatalf("Error loading index: %v", err)
 	}
+	defer func() { _ = index.Close() }()
 
 	results, err := index.Lookup(*searchQuery)
 	if err != nil {

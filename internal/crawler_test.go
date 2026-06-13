@@ -30,6 +30,10 @@ type FakeIndexer struct{}
 func (f *FakeIndexer) Add(_ *CrawlResult) error { return nil }
 func (f *FakeIndexer) Save() error               { return nil }
 
+func (f *FakeIndexer) Close() error {
+	return nil
+}
+
 // newTestServer creates an httptest.Server whose handler is provided by the caller.
 // The server is automatically closed when the test ends.
 func newTestServer(t *testing.T, handler http.HandlerFunc) *httptest.Server {

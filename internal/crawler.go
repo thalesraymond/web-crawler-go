@@ -22,6 +22,7 @@ type ResultStorage interface {
 type IndexWriter interface {
 	Add(result *CrawlResult) error
 	Save() error
+	Close() error
 }
 
 type Crawler struct {
@@ -137,6 +138,10 @@ func (c *Crawler) Start(seedUrl string) {
 	// Persist the index once all pages have been processed.
 	if err := c.indexer.Save(); err != nil {
 		log.Printf("Error saving index: %v", err)
+	}
+
+	if err := c.indexer.Close(); err != nil {
+		log.Printf("Error closing index: %v", err)
 	}
 }
 
