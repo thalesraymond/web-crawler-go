@@ -160,7 +160,7 @@ func TestSave_ConcurrentSaves_NoDataRace(t *testing.T) {
 	wg.Wait()
 }
 
-func TestSave_FilePermissions_Are644(t *testing.T) {
+func TestSave_FilePermissions_Are600(t *testing.T) {
 	s, dir := newTempStorage(t)
 
 	result := &internal.CrawlResult{URL: "https://example.com/perms"}
@@ -176,8 +176,8 @@ func TestSave_FilePermissions_Are644(t *testing.T) {
 		t.Fatalf("could not stat file: %v", err)
 	}
 
-	const perm644 = os.FileMode(0644)
-	if info.Mode().Perm() != perm644 {
-		t.Errorf("expected permissions %o, got %o", perm644, info.Mode().Perm())
+	const perm600 = os.FileMode(0600)
+	if info.Mode().Perm() != perm600 {
+		t.Errorf("expected permissions %o, got %o", perm600, info.Mode().Perm())
 	}
 }
