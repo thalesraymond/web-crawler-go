@@ -84,11 +84,11 @@ func TestFileIndex_RoundTrip(t *testing.T) {
 	if err != nil {
 		t.Fatal(err)
 	}
-	tmp.Close() // nolint:errcheck
+	tmp.Close()                 // nolint:errcheck
 	defer os.Remove(tmp.Name()) // nolint:errcheck
 
 	fi := newFileIndex(tmp.Name())
-	fi.Add(makeResult("https://a.com", map[string]int{"wikipedia": 5})) // nolint:errcheck
+	fi.Add(makeResult("https://a.com", map[string]int{"wikipedia": 5}))              // nolint:errcheck
 	fi.Add(makeResult("https://b.com", map[string]int{"wikipedia": 2, "golang": 8})) // nolint:errcheck
 
 	if err := fi.Save(); err != nil {
@@ -127,8 +127,8 @@ func TestFileIndex_LoadOrCreate_CorruptFile(t *testing.T) {
 		t.Fatal(err)
 	}
 	tmp.WriteString("NOT VALID JSON{{{{") // nolint:errcheck
-	tmp.Close()                      // nolint:errcheck
-	defer os.Remove(tmp.Name())      // nolint:errcheck
+	tmp.Close()                           // nolint:errcheck
+	defer os.Remove(tmp.Name())           // nolint:errcheck
 
 	fi, err := LoadOrCreate(tmp.Name())
 	if err != nil {

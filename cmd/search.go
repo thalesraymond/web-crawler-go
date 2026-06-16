@@ -64,4 +64,3 @@ func runSearch(args []string) {
 		fmt.Printf("  %d. %s (count: %d)\n", rank+1, entry.UrlString, entry.Count)
 	}
 }
-
