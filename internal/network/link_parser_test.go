@@ -1,6 +1,7 @@
 package network
 
 import (
+	"slices"
 	"testing"
 )
 
@@ -126,21 +127,12 @@ func TestExtractLinks(t *testing.T) {
 			}
 
 			for _, wantLink := range tt.wantLinks {
-				if !contains(gotLinks, wantLink) {
+				if !slices.Contains(gotLinks, wantLink) {
 					t.Errorf("expected link %q not found", wantLink)
 				}
 			}
 		})
 	}
-}
-
-func contains(links []string, link string) bool {
-	for _, l := range links {
-		if l == link {
-			return true
-		}
-	}
-	return false
 }
 
 func TestIsValidLink(t *testing.T) {
