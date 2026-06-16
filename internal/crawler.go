@@ -10,8 +10,6 @@ import (
 	"github.com/thalesraymond/web-crawler-go/internal/network"
 )
 
-const MaxWorkers = 10
-
 type ResultStorage interface {
 	Save(result *CrawlResult) error
 }
