@@ -22,7 +22,7 @@ func newBoltIndexForTest(t *testing.T) (*BoltIndex, func()) {
 	}
 
 	cleanup := func() {
-		bi.Close() // nolint:errcheck
+		bi.Close()            // nolint:errcheck
 		os.Remove(tmp.Name()) // nolint:errcheck
 	}
 
@@ -110,7 +110,7 @@ func TestBoltIndex_RoundTrip(t *testing.T) {
 	if err != nil {
 		t.Fatal(err)
 	}
-	tmp.Close() // nolint:errcheck
+	tmp.Close()                 // nolint:errcheck
 	defer os.Remove(tmp.Name()) // nolint:errcheck
 
 	bi, err := LoadOrCreateBolt(tmp.Name())
@@ -118,7 +118,7 @@ func TestBoltIndex_RoundTrip(t *testing.T) {
 		t.Fatal(err)
 	}
 
-	bi.Add(makeResult("https://a.com", map[string]int{"wikipedia": 5})) // nolint:errcheck
+	bi.Add(makeResult("https://a.com", map[string]int{"wikipedia": 5}))              // nolint:errcheck
 	bi.Add(makeResult("https://b.com", map[string]int{"wikipedia": 2, "golang": 8})) // nolint:errcheck
 
 	if err := bi.Save(); err != nil {

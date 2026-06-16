@@ -47,12 +47,12 @@ func (s *FileStorage) Save(result *internal.CrawlResult) error {
 	}
 
 	const readWriteOwner = os.FileMode(0400) | os.FileMode(0200)
-	const readGroup = os.FileMode(0040)
-	const readOthers = os.FileMode(0004)
+	const readGroup = os.FileMode(0000)
+	const readOthers = os.FileMode(0000)
 
-	var perm644 = readWriteOwner | readGroup | readOthers
+	var perm600 = readWriteOwner | readGroup | readOthers
 
-	if err := os.WriteFile(filePath, jsonData, perm644); err != nil {
+	if err := os.WriteFile(filePath, jsonData, perm600); err != nil {
 		return err
 	}
 

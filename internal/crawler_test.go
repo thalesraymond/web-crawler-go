@@ -28,7 +28,7 @@ func (f *FakeStorage) Save(result *CrawlResult) error {
 type FakeIndexer struct{}
 
 func (f *FakeIndexer) Add(_ *CrawlResult) error { return nil }
-func (f *FakeIndexer) Save() error               { return nil }
+func (f *FakeIndexer) Save() error              { return nil }
 
 func (f *FakeIndexer) Close() error {
 	return nil

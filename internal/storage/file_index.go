@@ -103,14 +103,13 @@ func (fi *FileIndex) Save() error {
 		return err
 	}
 
-	return os.WriteFile(fi.filePath, data, 0644)
+	return os.WriteFile(fi.filePath, data, 0600)
 }
 
 // Close is a no-op for FileIndex since it doesn't hold persistent resources open.
 func (fi *FileIndex) Close() error {
 	return nil
 }
-
 
 // Lookup returns the posting list for the given word.
 // The word is normalized through ProcessWord before the lookup,
