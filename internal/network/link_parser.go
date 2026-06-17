@@ -72,13 +72,13 @@ func ExtractLinks(baseURL string, htmlBody string) ([]string, error) {
 	return links, nil
 }
 
-func isValidLink(link string) bool {
-	invalidPrefixes := []string{
-		"javascript:",
-		"mailto:",
-		"#",
-	}
+var invalidPrefixes = []string{
+	"javascript:",
+	"mailto:",
+	"#",
+}
 
+func isValidLink(link string) bool {
 	lowerLink := strings.ToLower(link)
 	for _, invalidPrefix := range invalidPrefixes {
 		if strings.HasPrefix(lowerLink, invalidPrefix) {

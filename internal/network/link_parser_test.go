@@ -231,3 +231,19 @@ func TestIsValidLink(t *testing.T) {
 		})
 	}
 }
+
+func BenchmarkIsValidLink(b *testing.B) {
+	links := []string{
+		"https://example.com/some/path",
+		"javascript:void(0)",
+		"mailto:test@example.com",
+		"#section",
+		"/relative/path",
+	}
+	b.ResetTimer()
+	for i := 0; i < b.N; i++ {
+		for _, link := range links {
+			isValidLink(link)
+		}
+	}
+}
